@@ -1,4 +1,4 @@
-const baseMaterials = [
+﻿const baseMaterials = [
   ["标准面板", "1500*3000*6", "批次", 32, 0, 32, "KC-BOM-202605-018", "直出", "¥540/块/月", "每月每件", "可匹配", "可编辑", "系统初次配模"],
   ["钢支撑", "609x16x6000", "批次", 48, 0, 48, "产品清单", "翻新", "¥240/根/月", "每月每件", "部分匹配", "可编辑", "翻新后出库"],
   ["对拉杆", "M24*1200", "数量", 180, 0, 180, "KC-BOM-202605-021", "采购", "¥36/根/月", "每月每件", "无库存", "可编辑", "采购补充"]
@@ -32,12 +32,14 @@ function createMaterialPlans(materials, progress, status) {
     splits: splitTemplates[materialIndex].map(([type, quantity], splitIndex) => {
       const completedOutbound = progress === 100 ? quantity : 0;
       const executingOutbound = progress > 0 && materialIndex === 0 && splitIndex === 0 ? Math.min(12, quantity) : 0;
+      const taskStatus = executionTaskStatus(type, status, progress, materialIndex, splitIndex);
       return {
         type,
         quantity,
         outbound: completedOutbound || executingOutbound,
         price: row[8],
         billing: row[9],
+        taskStatus,
         changeStatus: completedOutbound || executingOutbound ? "已出库锁定" : ["审批通过", "执行中"].includes(status) ? "未出库可变更" : status === "已完成" ? "已完成" : "可编辑",
         note: type === "直出" ? "库存直接配模" : `${type}补充`
       };
@@ -45,6 +47,19 @@ function createMaterialPlans(materials, progress, status) {
   }));
 }
 
+function executionTaskStatus(type, status, progress, materialIndex, splitIndex) {
+  if (type === "直出") return { label: "库存可出库", ready: true };
+  if (status === "已完成") return { label: `${type}已完成`, ready: true };
+  if (status === "执行中" && type === "翻新" && materialIndex === 1 && splitIndex === 0) return { label: "翻新完成", ready: true };
+  if (["翻新", "改制"].includes(type)) return { label: `${type}待入库`, ready: false };
+  if (["采购", "新生产"].includes(type)) return { label: `${type}待完成`, ready: false };
+  return { label: "待确认", ready: false };
+}
+
+function availableOutboundQty(split) {
+  if (!split.taskStatus?.ready) return 0;
+  return Math.max(0, Number(split.quantity) - Number(split.outbound));
+}
 const orders = [
   makeOrder("ZL-202606-001", "草稿", "待提交", "计划同步", "JH-ZL-202606-001", "华东高架 3 标", 0),
   makeOrder("ZL-202606-002", "待审批", "审批中", "手动新增", "-", "汉江桥梁 2 标", 0),
@@ -92,6 +107,26 @@ const materialCostSources = [
       { price: 60, sources: ["数量成本记录 SL-2026-04｜2026-04-16 入库｜可用 160 根", "数量成本记录 SL-2026-05｜2026-05-22 入库｜可用 120 根"] }
     ]
   }
+];
+
+const inventorySourceCatalog = [
+  [
+    { price: 1680, type: "批次", code: "KC-MB-2026-03", available: 12, date: "2026-03-12", location: "A01-02" },
+    { price: 1680, type: "批次", code: "KC-MB-2026-04", available: 10, date: "2026-04-08", location: "A01-05" },
+    { price: 1800, type: "批次", code: "KC-MB-2026-05", available: 20, date: "2026-05-06", location: "A02-01" },
+    { price: 1800, type: "批次", code: "KC-MB-2026-06", available: 16, date: "2026-06-02", location: "A02-04" }
+  ],
+  [
+    { price: 760, type: "批次", code: "KC-ZC-2026-02", available: 20, date: "2026-02-18", location: "B03-01" },
+    { price: 760, type: "批次", code: "KC-ZC-2026-03", available: 18, date: "2026-03-20", location: "B03-03" },
+    { price: 800, type: "批次", code: "KC-ZC-2026-04", available: 30, date: "2026-04-09", location: "B04-01" },
+    { price: 800, type: "批次", code: "KC-ZC-2026-05", available: 24, date: "2026-05-15", location: "B04-06" }
+  ],
+  [
+    { price: 56, type: "数量", code: "SL-2026-02", available: 80, date: "2026-02-10", location: "C01-01" },
+    { price: 60, type: "数量", code: "SL-2026-04", available: 160, date: "2026-04-16", location: "C01-04" },
+    { price: 60, type: "数量", code: "SL-2026-05", available: 120, date: "2026-05-22", location: "C02-02" }
+  ]
 ];
 
 function makeOrder(code, status, auditStatus, source, plan, project, progress) {
@@ -156,7 +191,8 @@ function makeOrder(code, status, auditStatus, source, plan, project, progress) {
     plannedOutbound: "2026-06-18",
     outboundPercent: progress,
     outboundStatus: progress === 100 ? "已出库" : progress > 0 ? "部分出库" : "未出库",
-    settlementStatus: progress > 0 ? "待结算" : "未生成",
+    settlementStatus: progress === 100 ? "已结清" : progress > 0 ? "部分已结" : status === "审批通过" ? "本月待结" : "未开始",
+    settlementProgress: progress === 100 ? "已结4/4期" : progress > 0 ? "已结2/4期" : status === "审批通过" ? "6月待结" : "未开始",
     materials,
     materialPlans: createMaterialPlans(materials, progress, status),
     fees: [["进场运费", "¥9,000", "指定日期", "2026-06-20", "进场运输费用", "已设置"], ["退场运费", "¥9,000", "指定日期", "2026-10-30", "退场运输费用", "已设置"], ["现场指导费", "¥6,000", "按月分摊", "2026-06-20 至 2026-10-30", "按预计使用周期分摊", "已设置"]],
@@ -179,12 +215,14 @@ const outboundModal = document.querySelector("#outboundModal");
 const planSelectModal = document.querySelector("#planSelectModal");
 const projectSelectModal = document.querySelector("#projectSelectModal");
 const bomPriceModal = document.querySelector("#bomPriceModal");
+const inventorySourceModal = document.querySelector("#inventorySourceModal");
 let selectedPlan = null;
 let selectedProject = null;
+let activeSourceTarget = null;
 
 function statusClass(value) {
   if (["审批通过", "已完成", "已通过", "已出库", "已执行"].includes(value)) return "ok";
-  if (["执行中", "部分出库", "待结算"].includes(value)) return "run";
+  if (["执行中", "部分出库", "待结算", "本月待结", "部分已结"].includes(value)) return "run";
   if (["不通过", "已关闭"].includes(value)) return "danger";
   if (value === "已撤回") return "closed";
   return "wait";
@@ -210,9 +248,7 @@ function rowActions(item) {
   if (["草稿", "已撤回", "不通过"].includes(item.status)) actions.push(`<button class="link-btn edit">编辑</button>`);
   if (item.status === "草稿") actions.push(`<button class="link-btn submit">提交</button>`);
   if (item.status === "待审批") actions.push(`<button class="link-btn withdraw">撤回</button>`);
-  if (["审批通过", "执行中", "已完成"].includes(item.status)) actions.push(`<button class="link-btn cost">成本分析</button>`);
   if (["审批通过", "执行中"].includes(item.status)) actions.push(`<button class="link-btn change-material">变更</button>`);
-  if (item.status === "审批通过") actions.push(`<button class="link-btn execute">分批出库</button>`);
   if (["草稿", "已撤回"].includes(item.status)) actions.push(`<button class="link-btn danger delete">删除</button>`);
   return actions.join("");
 }
@@ -240,7 +276,7 @@ function renderRows(list) {
       <td><input type="checkbox" /></td><td>${item.code}</td><td>${item.sourcePlan}</td><td>${item.project}</td><td>${item.company}</td><td>${item.warehouse}</td><td>${item.requiredQuantity}</td><td>${item.outboundQuantity}</td><td>${item.rule}</td>
       <td><span class="status ${statusClass(item.status)}">${item.status}</span></td>
       <td><div class="progress"><b><i style="width:${item.outboundPercent}%"></i></b><span>${item.outboundPercent}%</span></div></td>
-      <td><span class="status ${statusClass(item.settlementStatus)}">${item.settlementStatus}</span></td>
+      <td><span class="status ${statusClass(item.settlementStatus)}">${item.settlementProgress}</span></td>
       <td><div class="row-actions">${rowActions(item)}</div></td>
     </tr>`).join("");
   document.querySelector(".table-panel table").classList.toggle("hidden", list.length === 0);
@@ -254,11 +290,9 @@ function bindRowActions() {
     const item = orders[Number(tr.dataset.index)];
     tr.querySelector(".view")?.addEventListener("click", () => openDetail(item));
     tr.querySelector(".edit")?.addEventListener("click", () => openEdit(item));
-    tr.querySelector(".cost")?.addEventListener("click", () => openCost(item));
     tr.querySelector(".change-material")?.addEventListener("click", () => openMaterialChange(item));
     tr.querySelector(".submit")?.addEventListener("click", () => openChange("提交审批", "草稿", "待审批"));
     tr.querySelector(".withdraw")?.addEventListener("click", () => openChange("撤回订单", "待审批", "已撤回"));
-    tr.querySelector(".execute")?.addEventListener("click", () => openDetail(item));
     tr.querySelector(".delete")?.addEventListener("click", () => openChange("删除订单", item.code, "删除"));
   });
 }
@@ -316,21 +350,22 @@ function renderDetailMaterials(approved) {
       <td><div class="tree-name"><button class="tree-toggle" data-toggle-material="${materialIndex}">${expanded ? "−" : "+"}</button>${material.name}</div>${material.sourceBom ? `<span class="tree-source">${material.sourceBom}</span>` : ""}</td>
       <td>${material.spec}</td><td>${material.dimension}</td><td>${material.demand}</td>
       <td><span class="stock-value ${shortage ? "shortage" : ""}">${material.actualStock}<small>${shortage ? `缺口 ${material.demand - material.actualStock}` : "库存充足"}</small></span></td>
-      <td><span class="split-total">${splitTotal} / ${material.demand}</span></td><td>${totalOutbound}</td><td>-</td><td>${material.splits.length} 种路径</td><td>${bomPricing[material.sourceBom]?.price || material.price}</td><td>${bomPricing[material.sourceBom]?.billing || material.billing}</td>
+      <td><span class="split-total">${splitTotal} / ${material.demand}</span></td><td>${totalOutbound}</td><td>${material.splits.reduce((sum, split) => sum + availableOutboundQty(split), 0)}</td><td>-</td><td>-</td><td>${material.splits.length} 种路径</td><td>${bomPricing[material.sourceBom]?.price || material.price}</td><td>${bomPricing[material.sourceBom]?.billing || material.billing}</td>
       <td>${material.note}</td>
     </tr>`;
-    const children = material.splits.map((split) => {
-      const remaining = Math.max(0, split.quantity - split.outbound);
-      const canOutbound = approved && ["审批通过", "执行中"].includes(current.status) && remaining > 0;
+    const children = material.splits.map((split, splitIndex) => {
+      const available = availableOutboundQty(split);
+      const canOutbound = approved && ["审批通过", "执行中"].includes(current.status) && available > 0;
       return `<tr class="material-child ${expanded ? "" : "hidden"}" data-material-child="${materialIndex}">
         <td><input type="checkbox" ${canOutbound ? "" : "disabled"} /></td><td><span class="tree-branch">└</span>配模明细</td><td>-</td><td>-</td><td>-</td><td>-</td>
-        <td>${split.quantity}</td><td>${split.outbound}</td><td>${canOutbound ? `<input class="outbound-qty" value="${Math.min(remaining, 8)}" />` : "-"}</td>
-        <td><span class="method ${pathClass(split.type)}">${split.type}</span></td><td>-</td><td>-</td><td>${split.note}</td>
+        <td>${split.quantity}</td><td>${split.outbound}</td><td><span class="status ${canOutbound ? "ok" : "wait"}">${available}</span><span class="price-lock-note">${split.taskStatus?.label || "待确认"}</span></td><td>${canOutbound ? `<input class="outbound-qty" value="${Math.min(available, 8)}" />` : "-"}</td>
+        <td><div class="source-pick"><button class="select-source" data-source-mode="detail" data-source-material="${materialIndex}" data-source-split="${splitIndex}" ${canOutbound ? "" : "disabled"}>调整来源</button><span>${split.sourceSummary || "FIFO"}</span></div></td><td><span class="method ${pathClass(split.type)}">${split.type}</span></td><td>-</td><td>-</td><td>${split.note}</td>
       </tr>`;
     }).join("");
     return parent + children;
   }).join("");
   bindTreeToggles();
+  bindSourcePickers();
 }
 
 function bindTreeToggles() {
@@ -371,7 +406,7 @@ function renderChangeMaterials() {
       <td><span class="stock-value ${shortage ? "shortage" : ""}">${material.actualStock}<small>${shortage ? `缺口 ${material.demand - material.actualStock}` : "库存充足"}</small></span></td>
       <td><span class="split-total">${splitTotal} / ${material.demand}</span></td><td>${material.splits.length} 种路径</td>
       <td><input value="${material.price}" ${parentLocked ? "disabled" : ""} /></td>
-      <td><select ${parentLocked ? "disabled" : ""}>${["每月每件", "每月每吨", "一口价", "按工程量"].map((type) => selectedOption(type, material.billing)).join("")}</select></td>
+      <td><select ${parentLocked ? "disabled" : ""}>${["每月每件", "每月每吨", "一口价", "按工程量"].map((type) => selectedOption(type, material.billing)).join("")}</select></td><td>-</td>
       <td>${parentLocked ? "已出库物资项锁定" : material.note}</td><td><button data-change-add="${materialIndex}">新增拆分</button></td>
     </tr>`;
     const children = material.splits.map((split, splitIndex) => {
@@ -380,7 +415,7 @@ function renderChangeMaterials() {
         <td><input type="checkbox" ${locked ? "disabled" : ""} /></td><td><span class="tree-branch">└</span>配模明细 ${splitIndex + 1}</td><td>-</td><td>-</td><td>-</td><td>-</td>
         <td><input value="${split.quantity}" min="${split.outbound}" ${locked ? "disabled" : ""} /></td>
         <td><select ${locked ? "disabled" : ""}>${["直出", "翻新", "改制", "新生产", "采购"].map((type) => selectedOption(type, split.type)).join("")}</select></td>
-        <td>-</td><td>-</td><td><input value="${split.note}" ${locked ? "disabled" : ""} /></td>
+        <td>-</td><td>-</td><td><div class="source-pick"><button class="select-source" data-source-mode="change" data-source-material="${materialIndex}" data-source-split="${splitIndex}" ${locked ? "disabled" : ""}>选择来源</button><span>${split.sourceSummary || "未选择"}</span></div></td><td><input value="${split.note}" ${locked ? "disabled" : ""} /></td>
         <td><button class="change-delete-split" ${locked ? "disabled" : ""}>删除</button></td>
       </tr>`;
     }).join("");
@@ -398,6 +433,7 @@ function renderChangeMaterials() {
     current.materialPlans[materialIndex].splits.splice(splitIndex, 1);
     renderChangeMaterials();
   });
+  bindSourcePickers();
 }
 
 function renderLedger() {
@@ -447,7 +483,7 @@ function renderEditMaterials() {
       <td><span class="stock-value ${shortage ? "shortage" : ""}">${material.actualStock}<small>${shortage ? `缺口 ${material.demand - material.actualStock}` : "库存充足"}</small></span></td>
       <td><span class="split-total">${splitTotal} / ${material.demand}</span></td><td>${material.splits.length} 种路径</td>
       <td><input class="parent-price ${locked ? "locked-price" : ""}" data-material-price="${materialIndex}" value="${materialPrice}" ${locked ? "disabled" : ""} />${locked ? `<span class="price-lock-note">按 BOM 定价</span>` : ""}</td>
-      <td><select class="parent-billing" data-material-billing="${materialIndex}" ${locked ? "disabled" : ""}>${["每月每件", "每月每吨", "一口价", "按工程量"].map((type) => selectedOption(type, materialBilling)).join("")}</select></td>
+      <td><select class="parent-billing" data-material-billing="${materialIndex}" ${locked ? "disabled" : ""}>${["每月每件", "每月每吨", "一口价", "按工程量"].map((type) => selectedOption(type, materialBilling)).join("")}</select></td><td>-</td>
       <td>${material.note}</td><td><button class="add-split" data-add-split="${materialIndex}">拆分配模</button></td>
     </tr>`;
     const children = material.splits.map((split, splitIndex) => {
@@ -456,6 +492,7 @@ function renderEditMaterials() {
         <td><input value="${split.quantity}" /></td>
         <td><select>${["直出", "翻新", "改制", "新生产", "采购"].map((type) => selectedOption(type, split.type)).join("")}</select></td>
         <td>-</td><td>-</td>
+        <td><div class="source-pick"><button class="select-source" data-source-mode="edit" data-source-material="${materialIndex}" data-source-split="${splitIndex}">选择来源</button><span>${split.sourceSummary || "未选择"}</span></div></td>
         <td><input value="${split.note}" /></td><td><button class="delete-split">删除</button></td>
       </tr>`;
     }).join("");
@@ -482,6 +519,7 @@ function renderEditMaterials() {
       renderEditMaterials();
     }
   });
+  bindSourcePickers();
 }
 
 function openCost(item) {
@@ -526,8 +564,63 @@ function bindCostSelectors() {
 }
 
 function openModal(modal) { modal.classList.remove("hidden"); mask.classList.remove("hidden"); }
-function closeModals() { [syncModal, changeModal, outboundModal, planSelectModal, projectSelectModal, bomPriceModal].forEach((m) => m.classList.add("hidden")); mask.classList.add("hidden"); }
+function closeModals() { [syncModal, changeModal, outboundModal, planSelectModal, projectSelectModal, bomPriceModal, inventorySourceModal].forEach((m) => m.classList.add("hidden")); mask.classList.add("hidden"); }
 function openChange(type, before, after) { document.querySelector("#changeTitle").textContent = type; document.querySelector("#beforeChange").value = before; document.querySelector("#afterChange").value = after; openModal(changeModal); }
+
+function bindSourcePickers() {
+  document.querySelectorAll(".select-source").forEach((button) => button.onclick = () => openInventorySource(button));
+}
+
+function openInventorySource(button) {
+  activeSourceTarget = {
+    mode: button.dataset.sourceMode,
+    materialIndex: Number(button.dataset.sourceMaterial),
+    splitIndex: Number(button.dataset.sourceSplit)
+  };
+  const material = current.materialPlans[activeSourceTarget.materialIndex];
+  const split = material.splits[activeSourceTarget.splitIndex];
+  document.querySelector("#inventorySourceTitle").textContent = `${material.name} ${split.type}来源选择`;
+  document.querySelector("#inventorySourceSummary").textContent = `配模数量 ${split.quantity}，优先按单位成本和入库时间展示，可选择不同批次、单件或数量来源。`;
+  renderInventorySourceRows();
+  openModal(inventorySourceModal);
+}
+
+function renderInventorySourceRows() {
+  const catalog = inventorySourceCatalog[activeSourceTarget.materialIndex] || [];
+  const selectedCodes = new Set((current.materialPlans[activeSourceTarget.materialIndex].splits[activeSourceTarget.splitIndex].sources || []).map((source) => source.code));
+  const grouped = catalog.reduce((acc, source) => {
+    (acc[source.price] ||= []).push(source);
+    return acc;
+  }, {});
+  document.querySelector("#inventorySourceRows").innerHTML = Object.keys(grouped).sort((a, b) => Number(a) - Number(b)).map((price) => {
+    const rows = grouped[price].sort((a, b) => a.date.localeCompare(b.date)).map((source) => {
+      const checked = selectedCodes.has(source.code);
+      return `<tr data-source-code="${source.code}" data-source-price="${source.price}" data-source-type="${source.type}" data-source-available="${source.available}" data-source-date="${source.date}" data-source-location="${source.location}">
+        <td><input type="checkbox" ${checked ? "checked" : ""} /></td><td>¥${source.price.toLocaleString()}</td><td>${source.type}</td><td>${source.code}</td><td>${source.available}</td><td>${source.date}</td><td>${source.location}</td><td><input value="${checked ? source.available : ""}" placeholder="数量" /></td>
+      </tr>`;
+    }).join("");
+    return `<tr class="source-price-row"><td></td><td colspan="7">单位成本 ¥${Number(price).toLocaleString()}，按入库时间先进先出排序</td></tr>${rows}`;
+  }).join("");
+}
+
+function confirmInventorySource() {
+  if (!activeSourceTarget) return;
+  const selected = [...document.querySelectorAll("#inventorySourceRows tr[data-source-code]")]
+    .filter((row) => row.querySelector("input[type='checkbox']").checked)
+    .map((row) => ({
+      code: row.dataset.sourceCode,
+      price: Number(row.dataset.sourcePrice),
+      type: row.dataset.sourceType,
+      quantity: Number(row.querySelector("td:last-child input").value) || 0
+    }));
+  const split = current.materialPlans[activeSourceTarget.materialIndex].splits[activeSourceTarget.splitIndex];
+  split.sources = selected;
+  split.sourceSummary = selected.length ? `${selected.length}条 / ${selected.reduce((sum, source) => sum + source.quantity, 0)}` : "未选择";
+  if (activeSourceTarget.mode === "change") renderChangeMaterials();
+  else if (activeSourceTarget.mode === "detail") renderDetailMaterials(["审批通过", "执行中", "已完成"].includes(current.status));
+  else renderEditMaterials();
+  closeModals();
+}
 
 function renderBomPricing() {
   const usedBomCodes = [...new Set(current.materialPlans.map((material) => material.sourceBom).filter(Boolean))];
@@ -628,7 +721,6 @@ function applySelectedProject() {
 
 document.querySelector("#query").onclick = () => renderRows(filteredOrders());
 document.querySelector("#reset").onclick = () => { ["#projectFilter", "#warehouseFilter", "#orderStatusFilter", "#outboundFilter", "#settleFilter"].forEach((s) => document.querySelector(s).value = "全部"); document.querySelector("#planFilter").value = ""; document.querySelector("#companyFilter").value = ""; renderRows(orders); };
-document.querySelector("#syncPlan").onclick = () => openModal(syncModal);
 document.querySelector("#newOrder").onclick = () => openEdit();
 document.querySelector("#exportOrder").onclick = () => openChange("导出订单", "当前筛选结果", "租赁订单台账");
 document.querySelector("#backFromDetail").onclick = () => showView("listView");
@@ -649,6 +741,7 @@ document.querySelector("#submitMaterialChange").onclick = () => {
 };
 document.querySelector("#bomPrice").onclick = () => { renderBomPricing(); openModal(bomPriceModal); };
 document.querySelector("#confirmBomPrice").onclick = confirmBomPricing;
+document.querySelector("#confirmInventorySource").onclick = confirmInventorySource;
 document.querySelector("#queryLedger").onclick = renderLedger;
 document.querySelector("#resetLedgerFilter").onclick = () => {
   document.querySelector("#ledgerTypeFilter").value = "全部";
@@ -687,3 +780,6 @@ else if (location.hash === "#editView") openEdit();
 else if (location.hash === "#materialChangeView") openMaterialChange(orders[4]);
 else if (location.hash === "#costView") openCost(orders[4]);
 else showView("listView");
+
+
+

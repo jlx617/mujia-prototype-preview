@@ -59,12 +59,13 @@
           <label>入库类型
             <select id="typeFilter">
               <option>全部</option>
-              <option>采购</option>
-              <option>新生产</option>
-              <option>退租</option>
-              <option>翻新</option>
-              <option>改制入库</option>
+              <option>租赁入库</option>
               <option>调拨入库</option>
+              <option>租赁退换入库</option>
+              <option>翻新入库</option>
+              <option>改制入库</option>
+              <option>采购入库</option>
+              <option>新生产入库</option>
             </select>
           </label>
           <label>入库单号
@@ -72,6 +73,9 @@
           </label>
           <label>来源单据
             <input id="sourceFilter" placeholder="请输入来源单据号">
+          </label>
+          <label>来源出库单
+            <input id="sourceOutboundFilter" placeholder="请输入来源出库单号">
           </label>
           <label>当前仓库
             <select id="warehouseFilter">
@@ -100,6 +104,24 @@
               <option>异常</option>
             </select>
           </label>
+          <label>审批状态
+            <select id="approvalFilter">
+              <option>全部</option>
+              <option>待提交</option>
+              <option>审批中</option>
+              <option>审批通过</option>
+              <option>驳回</option>
+            </select>
+          </label>
+          <label>差异状态
+            <select id="diffFilter">
+              <option>全部</option>
+              <option>无差异</option>
+              <option>待仓库确认差异</option>
+              <option>已同步来源出库记录</option>
+              <option>已同步业务订单</option>
+            </select>
+          </label>
           <label>入库状态
             <select id="statusFilter">
               <option>全部</option>
@@ -107,6 +129,9 @@
               <option>部分入库</option>
               <option>已入库</option>
             </select>
+          </label>
+          <label>入库日期
+            <input id="dateFilter" value="2026-05-01 至 2026-06-22">
           </label>
           <div class="filter-actions">
             <button type="button" class="primary" id="queryBtn">查询</button>
@@ -136,14 +161,15 @@
                 <tr>
                   <th><input type="checkbox" aria-label="全选"></th>
                   <th>入库单号</th>
-                  <th>业务类型</th>
-                  <th>来源单据</th>
-                  <th>入库仓库</th>
+                  <th>入库类型</th>
+                  <th>来源业务单据</th>
+                  <th>来源出库单</th>
+                  <th>入库位置/目标仓库</th>
+                  <th>项目/来源仓库</th>
                   <th>物资项数</th>
-                  <th>数量</th>
-                  <th>成本状态</th>
-                  <th>验收状态</th>
-                  <th>确认状态</th>
+                  <th>审批状态</th>
+                  <th>复核状态</th>
+                  <th>差异状态</th>
                   <th>入库状态</th>
                   <th>操作</th>
                 </tr>
@@ -213,37 +239,46 @@
             <dl class="info-grid" id="acceptInfo"></dl>
           </article>
           <article class="content-panel">
-            <h2>物资明细</h2>
-            <table class="detail-table">
-              <thead>
-                <tr>
-                  <th>产品</th>
-                  <th>规格</th>
-                  <th>管理维度</th>
-                  <th>批次/资产码</th>
-                  <th>应收数量</th>
-                  <th>实收数量</th>
-                  <th>成本</th>
-                  <th>库区库位</th>
-                  <th>附件</th>
-                  <th>备注</th>
-                </tr>
-              </thead>
-              <tbody id="detailItems"></tbody>
-            </table>
+            <h2>类型概要</h2>
+            <div class="type-summary-grid" id="typeOverviewCards"></div>
           </article>
           <article class="content-panel">
-            <h2>办理记录</h2>
-            <ol class="flow-list" id="processFlow"></ol>
+            <h2>来源与同步关系</h2>
+            <div class="relation-layout">
+              <dl class="compact-info" id="sourceRelationPanel"></dl>
+              <div class="sync-cards" id="syncCards"></div>
+            </div>
+          </article>
+          <article class="content-panel">
+            <h2 id="typeDetailTitle">类型专属信息</h2>
+            <div class="type-detail-panel" id="typeDetailPanel"></div>
+          </article>
+          <article class="content-panel">
+            <h2>复磅汇总</h2>
+            <dl class="info-grid" id="weightInfo"></dl>
+          </article>
+          <article class="content-panel">
+            <h2 id="detailMaterialTitle">入库物资清单</h2>
+            <div class="detail-table-wrap">
+            <table class="detail-table typed-detail-table">
+              <thead id="detailItemsHead"></thead>
+              <tbody id="detailItems"></tbody>
+            </table>
+            </div>
+          </article>
+          <article class="content-panel">
+            <h2>审批流</h2>
+            <div class="approval-tabs">
+              <button class="active" type="button">审批进度图</button>
+              <button type="button">审批进度表</button>
+              <button type="button">流程图</button>
+              <button type="button">传阅记录</button>
+            </div>
+            <div class="approval-timeline" id="processFlow"></div>
           </article>
           <article class="content-panel">
             <h2>附件</h2>
-            <div class="attachment-grid">
-              <div>验收照片：6 张</div>
-              <div>送货单：已上传</div>
-              <div>过磅单：已上传</div>
-              <div>质检记录：2 份</div>
-            </div>
+            <div class="file-list" id="detailFiles"></div>
           </article>
         </div>
       </section>
@@ -265,8 +300,10 @@
           <section class="content-panel">
             <h2>入库信息</h2>
             <div class="form-grid">
-              <label><span>入库类型</span><select id="handleType"><option>采购</option><option>新生产</option><option>退租</option><option>翻新</option><option>改制入库</option><option>调拨入库</option></select></label>
+              <label><span>入库类型</span><select id="handleType"><option>租赁入库</option><option>调拨入库</option><option>租赁退换入库</option><option>翻新入库</option><option>改制入库</option><option>采购入库</option><option>新生产入库</option></select></label>
               <label><span>来源单据</span><input id="handleSource" value="CG-20260518-011"></label>
+              <label><span>来源出库单</span><input id="handleSourceOutbound" value="CK-20260612-018"></label>
+              <label><span>来源订单</span><input id="handleSourceOrder" value="DD-20260518-011"></label>
               <label><span>入库仓库</span><select id="handleWarehouse"><option>上海物料站</option><option>苏州装备中心</option><option>华东项目虚拟仓</option></select></label>
               <label><span>项目</span><select id="handleProject"><option>汉江桥梁 2 标</option><option>沪苏湖站房</option><option>科创中心备料</option><option>华东高架 3 标</option><option>苏州综合管廊二期</option></select></label>
               <label><span>供应商</span><input id="handleSupplier" value="上海桥装装备有限公司"></label>
@@ -274,6 +311,21 @@
               <label><span>入库日期</span><input value="2026-05-29"></label>
               <label><span>验收结论</span><select><option>待验收</option><option>可用</option><option>待检</option><option>报废拒收</option><option>部分接收</option></select></label>
               <label><span>确认人</span><select><option>仓库业务操作角色（确认）</option><option>项目业务操作角色</option><option>公司组织查看角色</option></select></label>
+            </div>
+          </section>
+
+          <section class="content-panel">
+            <h2>类型办理信息</h2>
+            <div class="type-handle-brief" id="handleTypeGuidance"></div>
+            <div class="dynamic-form-grid" id="handleTypeFields"></div>
+          </section>
+
+          <section class="content-panel">
+            <h2>复磅汇总</h2>
+            <div class="form-grid weigh-grid">
+              <label><span>毛重(吨)</span><input id="grossWeight" type="number" step="0.01" min="0" value="17.20"></label>
+              <label><span>皮重(吨)</span><input id="tareWeight" type="number" step="0.01" min="0" value="4.40"></label>
+              <label><span>净重(吨)</span><input id="netWeight" value="12.80" readonly></label>
             </div>
           </section>
 
@@ -289,34 +341,20 @@
             </div>
             <div class="table-scroll">
               <table class="edit-table">
-                <thead>
-                  <tr>
-                    <th>产品</th>
-                    <th>规格</th>
-                    <th>管理维度</th>
-                    <th>批次/资产码</th>
-                    <th>应收数量</th>
-                    <th>实收数量</th>
-                    <th>成本</th>
-                    <th>库区库位</th>
-                    <th>附件</th>
-                    <th>备注</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
+                <thead id="handleItemsHead"></thead>
                 <tbody id="handleItems"></tbody>
               </table>
             </div>
           </section>
 
           <section class="content-panel">
-            <h2>附件与确认</h2>
-            <div class="upload-grid">
-              <button type="button">上传到货照片</button>
-              <button type="button">上传验收照片</button>
-              <button type="button">上传过磅单</button>
-              <button type="button">上传质检记录</button>
+            <h2>附件</h2>
+            <div class="upload-dropzone" id="uploadDropzone">
+              <strong>拖拽文件到此处或点击上传</strong>
+              <span>复磅照片、收货照片、签收/确认单</span>
+              <button type="button" class="primary">选择文件</button>
             </div>
+            <div class="file-list" id="handleFiles"></div>
           </section>
         </form>
       </section>
@@ -363,9 +401,11 @@
               <tr>
                 <th><input id="selectAllOutboundMaterials" type="checkbox" aria-label="全选当前物资"></th>
                 <th>来源出库单</th>
+                <th>来源订单</th>
+                <th>项目</th>
+                <th>仓库</th>
                 <th>产品</th>
                 <th>规格</th>
-                <th>管理维度</th>
                 <th>实出数量</th>
                 <th>已回库</th>
                 <th>可回库数量</th>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>模架工装管理系统 - 出库</title>
-  <link rel="stylesheet" href="./outbound.css">
+  <link rel="stylesheet" href="./outbound.css?v=20260622-detail-table-lines">
 </head>
 <body>
   <div class="app-shell">
@@ -70,13 +70,12 @@
           <label>业务类型
             <select id="typeFilter">
               <option>全部</option>
-              <option>租赁</option>
-              <option>退租</option>
-              <option>调拨</option>
-              <option>翻新</option>
-              <option>改制</option>
-              <option>报废</option>
-              <option>退货</option>
+              <option>租赁出库</option>
+              <option>调拨出库</option>
+              <option>租赁退换出库</option>
+              <option>翻新出库</option>
+              <option>改制出库</option>
+              <option>废旧处置出库</option>
             </select>
           </label>
           <label>来源单据
@@ -94,9 +93,19 @@
             <select id="confirmFilter">
               <option>全部</option>
               <option>待提交</option>
-              <option>待确认</option>
-              <option>已确认</option>
+              <option>审批中</option>
+              <option>审批通过</option>
               <option>驳回</option>
+            </select>
+          </label>
+          <label>差异状态
+            <select id="diffFilter">
+              <option>全部</option>
+              <option>无差异</option>
+              <option>待项目复核</option>
+              <option>待仓库确认差异</option>
+              <option>已同步入库记录</option>
+              <option>已同步租赁订单</option>
             </select>
           </label>
           <label>司机/车牌
@@ -143,12 +152,13 @@
                   <th>出库单号</th>
                   <th>业务类型</th>
                   <th>来源单据</th>
+                  <th>对向入库单</th>
                   <th>出库仓库</th>
                   <th>目标项目/仓库</th>
                   <th>物资项数</th>
-                  <th>确认状态</th>
+                  <th>审批状态</th>
+                  <th>差异状态</th>
                   <th>出库状态</th>
-                  <th>附件状态</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -203,40 +213,29 @@
             <h2>基本信息</h2>
             <dl class="info-grid" id="detailInfo"></dl>
           </article>
-          <article class="content-panel">
-            <h2>承运与确认</h2>
-            <dl class="info-grid" id="transportInfo"></dl>
-          </article>
-          <article class="content-panel">
-            <h2>物资明细</h2>
-            <table class="detail-table">
-              <thead>
-                <tr>
-                  <th>物资名称</th>
-                  <th>规格</th>
-                  <th>应出数量</th>
-                  <th>实出数量</th>
-                  <th>单位</th>
-                  <th>库区库位</th>
-                  <th>批次/资产编码</th>
-                  <th>过磅重量</th>
-                  <th>备注</th>
-                </tr>
-              </thead>
-              <tbody id="detailItems"></tbody>
-            </table>
+          <article class="content-panel material-panel">
+            <h2 id="detailMaterialTitle">出库物资清单</h2>
+            <div class="weight-summary" id="detailWeightSummary"></div>
+            <div class="detail-table-wrap">
+              <table class="detail-table compare-table">
+                <thead id="detailMaterialHead"></thead>
+                <tbody id="detailCompareRows"></tbody>
+              </table>
+            </div>
           </article>
           <article class="content-panel">
             <h2>审批流</h2>
-            <ol class="flow-list" id="approvalFlow"></ol>
+            <div class="approval-tabs">
+              <button class="active" type="button">审批进度图</button>
+              <button type="button">审批进度表</button>
+              <button type="button">流程图</button>
+              <button type="button">传阅记录</button>
+            </div>
+            <div class="approval-timeline" id="approvalFlow"></div>
           </article>
           <article class="content-panel">
             <h2>附件</h2>
-            <div class="attachment-grid">
-              <div>过磅照片：2 张</div>
-              <div>装车照片：4 张</div>
-              <div>纸质确认单：已上传</div>
-            </div>
+            <div class="file-list detail-file-list" id="detailAttachmentFiles"></div>
           </article>
         </div>
       </section>
@@ -258,16 +257,21 @@
           <section class="content-panel">
             <h2>出库信息</h2>
             <div class="form-grid">
-              <label><span>出库类型</span><select id="handleType"><option>租赁</option><option>退租</option><option>调拨</option><option>翻新</option><option>改制</option><option>报废</option><option>退货</option></select></label>
-              <label><span>目标项目</span><select id="handleProject"><option>汉江桥梁 2 标</option><option>沪苏湖站房</option><option>科创中心备料</option><option>华东高架 3 标</option><option>苏州综合管廊二期</option></select></label>
-              <label><span>来源订单</span><input id="handleSource" value="ZL-20260521-008"></label>
-              <label><span>仓库</span><select id="handleWarehouse"><option>上海物料站</option><option>苏州装备中心</option><option>华东项目虚拟仓</option></select></label>
-              <label><span>司机</span><input value="周明"></label>
-              <label><span>车牌</span><input value="沪A·K6208"></label>
-              <label><span>预计出库日期</span><input value="2026-05-29"></label>
-              <label><span>纸质确认单</span><select><option>随车签收后回传</option><option>现场已签收</option><option>无需纸质件</option></select></label>
-              <label><span>确认人</span><select><option>仓库负责人</option><option>公司组织查看角色</option></select></label>
+              <label><span>出库类型</span><select id="handleType"><option>租赁出库</option><option>调拨出库</option><option>租赁退换出库</option><option>翻新出库</option><option>改制出库</option><option>废旧处置出库</option></select></label>
+              <label id="handlePositionLabel"><span>目标项目</span><select id="handleProject"><option>汉江桥梁 2 标</option><option>沪苏湖站房</option><option>科创中心备料</option><option>华东高架 3 标</option><option>苏州综合管廊二期</option><option>上海物料站</option><option>苏州装备中心</option><option>阳逻厂库区</option></select></label>
+              <label><span>来源订单</span><input id="handleSource" value="ZL-20260521-008" placeholder="可手动选择或留空"></label>
+              <label class="hide-for-scrap"><span>仓库</span><select id="handleWarehouse"><option>上海物料站</option><option>苏州装备中心</option><option>华东项目虚拟仓</option></select></label>
+              <label class="hide-for-scrap"><span>对向入库单</span><input id="handleInbound" value="自动生成" readonly></label>
+              <label class="hide-for-scrap"><span>出场地址</span><input id="handleOutAddress" value="上海物料站 A 门"></label>
+              <label class="hide-for-scrap"><span>司机</span><input value="周明"></label>
+              <label class="hide-for-scrap"><span>车牌</span><input value="沪A·K6208"></label>
+              <label><span id="handleDateLabel">预计出库日期</span><input id="handleDate" value="2026-05-29"></label>
+              <label class="show-for-scrap"><span>处置原因</span><input id="handleDisposalReason" value="废旧挂架材料已完成现场鉴定，无法继续周转使用"></label>
+              <label class="show-for-scrap"><span>处置资产总净值(元)</span><input id="handleDisposalValue" value="27,578.96"></label>
+              <label class="hide-for-scrap"><span>纸质确认单</span><select><option>随车签收后回传</option><option>现场已签收</option><option>无需纸质件</option></select></label>
+              <label class="hide-for-scrap"><span>确认人</span><select><option>仓库负责人</option><option>公司组织查看角色</option></select></label>
             </div>
+            <div class="type-panel" id="handleTypePanel"></div>
           </section>
 
           <section class="content-panel">
@@ -277,32 +281,52 @@
             </div>
             <div class="table-scroll">
               <table class="edit-table">
-                <thead>
+                <thead id="handleItemsHead">
                   <tr>
                     <th>物资名称</th>
-                    <th>规格</th>
-                    <th>应出数量</th>
-                    <th>本次出库数量</th>
-                    <th>单位</th>
-                    <th>库区库位</th>
-                    <th>批次/资产编码</th>
-                    <th>过磅重量</th>
-                    <th>备注</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody id="handleItems"></tbody>
-              </table>
+                  <th>规格</th>
+                  <th>应出数量</th>
+                    <th>清点出库数量</th>
+                  <th>单位</th>
+                  <th>库区库位</th>
+                  <th>批次/资产编码</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="handleItems"></tbody>
+            </table>
+          </div>
+            <div class="weigh-panel">
+              <div class="weigh-title">
+                <strong>过磅汇总</strong>
+                <span>仓库按整车记录毛重、皮重，净重自动计算并带入确认单。</span>
+              </div>
+              <div class="weigh-grid">
+                <label><span>毛重(吨)</span><input id="grossWeight" class="weigh-input" value="20.80"></label>
+                <label><span>皮重(吨)</span><input id="tareWeight" class="weigh-input" value="4.20"></label>
+                <label><span>净重(吨)</span><input id="netWeight" value="16.60" readonly></label>
+                <label><span>过磅单号</span><input value="GB-20260622-008"></label>
+              </div>
             </div>
           </section>
 
           <section class="content-panel">
-            <h2>影像与确认</h2>
-            <div class="upload-grid">
-              <button type="button">上传过磅照片</button>
-              <button type="button">上传装车照片</button>
-              <button type="button">上传纸质确认单</button>
+            <div class="section-title-row">
+              <h2>附件</h2>
               <button type="button" id="previewConfirmBtn">生成确认单预览</button>
+            </div>
+            <div class="attachment-uploader" role="button" tabindex="0">
+              <div class="upload-cloud" aria-hidden="true">↑</div>
+              <strong>点击或将文件拖拽至框内上传</strong>
+              <span>支持过磅照片、装车照片、纸质确认单，单个文件不超过200MB</span>
+            </div>
+            <div class="file-list">
+              <span>文件名称.doc</span>
+              <span>过磅照片-毛重.jpg</span>
+              <span>装车照片-车尾.jpg</span>
+              <span>纸质确认单.pdf</span>
+              <span>文件名称.doc</span>
             </div>
             <div class="state-strip hidden">
               <span>加载中</span>
@@ -368,6 +392,7 @@
     </header>
     <div class="picker-filters">
       <label><span>订单编号/项目</span><input id="materialKeyword" placeholder="请输入订单编号、项目或物资名称"></label>
+      <label><span>来源订单</span><select id="materialOrderSelect"></select></label>
       <label><span>订单类型</span><select id="materialOrderType"><option>全部</option><option>租赁订单</option><option>调拨订单</option></select></label>
       <label><span>订单状态</span><select><option>审批通过</option></select></label>
       <div class="picker-query-actions">
@@ -376,18 +401,11 @@
       </div>
     </div>
     <div class="material-picker-body">
-      <aside class="order-tree">
-        <div class="tree-heading">
-          <strong>订单物资清单</strong>
-          <span id="orderTreeCount">0 单</span>
-        </div>
-        <div id="orderTree"></div>
-      </aside>
       <section class="picker-table-panel">
         <div class="picker-summary">
           <div>
             <strong id="selectedOrderTitle">全部已审批订单</strong>
-            <span id="selectedOrderMeta">请选择左侧订单查看物资</span>
+            <span id="selectedOrderMeta">可在筛选项中切换租赁订单或调拨订单</span>
           </div>
           <span>已选 <b id="selectedMaterialCount">0</b> 项</span>
         </div>
@@ -423,6 +441,6 @@
     </footer>
   </section>
 
-  <script src="./outbound.js"></script>
+  <script src="./outbound.js?v=20260622-detail-table-lines"></script>
 </body>
 </html>

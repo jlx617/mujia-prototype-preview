@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
@@ -73,7 +73,7 @@
             <label>当前仓库<select id="warehouseFilter"><option>全部</option><option>上海物料站</option><option>苏州装备中心</option><option>华东项目仓库</option></select></label>
             <label>订单状态<select id="orderStatusFilter"><option>全部</option><option>草稿</option><option>待审批</option><option>已撤回</option><option>不通过</option><option>审批通过</option><option>执行中</option><option>已完成</option></select></label>
             <label>出库状态<select id="outboundFilter"><option>全部</option><option>未出库</option><option>部分出库</option><option>已出库</option></select></label>
-            <label>结算状态<select id="settleFilter"><option>全部</option><option>未生成</option><option>待结算</option><option>结算中</option><option>已结算</option></select></label>
+            <label>结算进度<select id="settleFilter"><option>全部</option><option>未开始</option><option>本月待结</option><option>部分已结</option><option>已结清</option></select></label>
             <div class="query-actions"><button id="query" class="primary">查询</button><button id="reset">重置</button></div>
           </section>
 
@@ -81,7 +81,6 @@
             <div class="table-toolbar">
               <div class="toolbar-title">租赁订单列表</div>
               <div class="toolbar-actions">
-                <button id="syncPlan">同步已审批计划</button>
                 <button id="exportOrder">导出</button>
                 <button id="newOrder" class="primary">新增租赁订单</button>
               </div>
@@ -101,7 +100,7 @@
                     <th>租赁规则</th>
                     <th>订单状态</th>
                     <th>出库进度</th>
-                    <th>结算状态</th>
+                    <th>结算进度</th>
                     <th>操作</th>
                   </tr>
                 </thead>
@@ -110,7 +109,7 @@
               <div id="empty" class="empty hidden">
                 <div>∅</div>
                 <strong>暂无符合条件的租赁订单</strong>
-                <p>请调整筛选条件，或同步已审批的租赁需求计划。</p>
+                <p>请调整筛选条件，或新增租赁订单。</p>
               </div>
             </div>
             <footer class="pager">
@@ -163,7 +162,7 @@
               </div>
               <div class="table-mini material-table">
                 <table>
-                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>已出库数量</th><th>本次出库数量</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>备注</th></tr></thead>
+                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>已出库数量</th><th>可出库数量</th><th>本次出库数量</th><th>出库来源</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>备注</th></tr></thead>
                   <tbody id="materialRows"></tbody>
                 </table>
               </div>
@@ -270,7 +269,7 @@
               </div>
               <div class="table-mini edit-material-table">
                 <table>
-                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>备注</th><th>操作</th></tr></thead>
+                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>库存来源</th><th>备注</th><th>操作</th></tr></thead>
                   <tbody id="editMaterialRows"></tbody>
                 </table>
               </div>
@@ -332,7 +331,7 @@
               </div>
               <div class="table-mini edit-material-table">
                 <table>
-                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>备注</th><th>操作</th></tr></thead>
+                  <thead><tr><th><input type="checkbox" /></th><th>产品名称 / 配模明细</th><th>规格</th><th>管理维度</th><th>需求数量</th><th>实际库存</th><th>配模数量</th><th>配模类型</th><th>租赁单价</th><th>计费方式</th><th>库存来源</th><th>备注</th><th>操作</th></tr></thead>
                   <tbody id="changeMaterialRows"></tbody>
                 </table>
               </div>
@@ -378,6 +377,20 @@
         </div>
       </div>
       <footer><button class="closeModal">取消</button><button id="confirmBomPrice" class="primary">确定</button></footer>
+    </section>
+
+    <section id="inventorySourceModal" class="modal selection-modal inventory-source-modal hidden">
+      <header><h2 id="inventorySourceTitle">选择库存来源</h2><button class="closeModal">×</button></header>
+      <div class="modal-body">
+        <div class="source-current" id="inventorySourceSummary"></div>
+        <div class="selection-table inventory-source-table">
+          <table>
+            <thead><tr><th><input type="checkbox" /></th><th>单位成本</th><th>来源类型</th><th>批次/物资识别码</th><th>可用数量</th><th>入库时间</th><th>库位</th><th>本次选择数量</th></tr></thead>
+            <tbody id="inventorySourceRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <footer><button class="closeModal">取消</button><button id="confirmInventorySource" class="primary">确定</button></footer>
     </section>
 
     <section id="planSelectModal" class="modal selection-modal hidden">
@@ -454,3 +467,5 @@
     <script src="./rental-orders.js"></script>
   </body>
 </html>
+
+
