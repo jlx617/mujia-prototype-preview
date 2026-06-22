@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模架工装管理系统 - 采购订单管理</title>
+    <link rel="stylesheet" href="./purchase-orders.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="global-topbar">
+        <div class="brand">
+          <span class="brand-mark">科</span>
+          <strong>模架工装管理系统</strong>
+        </div>
+        <div class="top-tools">
+          <button>意见反馈</button>
+          <button>主题</button>
+          <button class="notice-dot">通知</button>
+          <span class="avatar">仓</span>
+          <span>仓库业务操作角色</span>
+          <span class="arrow">⌄</span>
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <button class="collapse">☰</button>
+        <nav>
+          <div class="menu-section">
+            <button class="menu-item"><span>▦</span>基础设置<i>›</i></button>
+            <button class="submenu">仓库设置</button>
+            <button class="submenu">产品分类</button>
+            <button class="submenu">产品清单</button>
+            <button class="submenu">BOM 清单</button>
+          </div>
+          <div class="menu-section">
+            <button class="menu-item open"><span>▤</span>订单管理<i>⌄</i></button>
+            <button class="submenu">租赁订单管理</button>
+            <button class="submenu">调拨订单管理</button>
+            <button class="submenu active">采购订单管理</button>
+          </div>
+          <div class="menu-section">
+            <button class="menu-item"><span>▥</span>仓库业务<i>›</i></button>
+            <button class="submenu">仓库管理</button>
+            <button class="submenu">出库</button>
+            <button class="submenu">入库</button>
+            <button class="submenu">盘点</button>
+            <button class="submenu">翻新</button>
+          </div>
+          <div class="menu-section">
+            <button class="menu-item"><span>□</span>统计分析<i>›</i></button>
+            <button class="submenu">库存分析</button>
+            <button class="submenu">成本分析</button>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="page-main">
+        <section id="listView" class="page-view">
+          <div class="page-title">
+            <div>
+              <h1>采购订单管理</h1>
+              <span>订单管理 &gt; <b>采购订单管理</b></span>
+            </div>
+          </div>
+
+          <section class="query-panel">
+            <label>来源订单<input id="sourceOrderFilter" placeholder="订单编号" /></label>
+            <label>来源 BOM<input id="sourceBomFilter" placeholder="BOM 编号" /></label>
+            <label>需求类型<select id="typeFilter"><option>全部</option><option>采购</option><option>新生产</option></select></label>
+            <label>供应商<input id="supplierFilter" placeholder="供应商名称" /></label>
+            <label>项目<select id="projectFilter"><option>全部</option><option>华东高架 3 标</option><option>沪苏湖站房</option><option>汉江桥梁 2 标</option><option>苏州综合管廊二期</option></select></label>
+            <label>发起方式<select id="launchFilter"><option>全部</option><option>订单同步</option><option>手工发起</option></select></label>
+            <label>状态<select id="statusFilter"><option>全部</option><option>草稿</option><option>待下单</option><option>执行中</option><option>部分入库</option><option>已完成</option><option>已关闭</option></select></label>
+            <label>审批状态<select id="approvalFilter"><option>全部</option><option>待提交</option><option>审批中</option><option>已通过</option><option>已退回</option><option>无需审批</option><option>待确认</option></select></label>
+            <div class="query-actions"><button id="query" class="primary">查询</button><button id="reset">重置</button></div>
+          </section>
+
+          <section class="table-panel">
+            <div class="table-toolbar">
+              <div class="toolbar-title">采购 / 新生产需求列表</div>
+              <div class="toolbar-actions">
+                <button id="exportOrder">导出</button>
+                <button id="generateFromOrder">订单同步</button>
+                <button id="newRequirement" class="primary">手工发起</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" /></th>
+                    <th data-sort="code">需求单号</th>
+                    <th>项目</th>
+                    <th>来源订单</th>
+                    <th>来源 BOM</th>
+                    <th>需求类型</th>
+                    <th>发起方式</th>
+                    <th data-sort="itemCount">物资项数</th>
+                    <th data-sort="qty">预计数量</th>
+                    <th>供应商</th>
+                    <th data-sort="arrival">预计到货</th>
+                    <th>入库进度</th>
+                    <th>审批状态</th>
+                    <th>成本状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="requirementRows"></tbody>
+              </table>
+              <div id="empty" class="empty hidden">
+                <div>∅</div>
+              <strong>暂无符合条件的采购 / 新生产需求</strong>
+              <p>请调整筛选条件，或通过订单同步、手工发起建立需求。</p>
+              </div>
+            </div>
+            <footer class="pager">
+              <span id="pageSummary">共 0 条，已选 0 项</span>
+              <button>上一页</button>
+              <button class="current">1</button>
+              <button>2</button>
+              <button>下一页</button>
+              <select><option>10 条 / 页</option><option>20 条 / 页</option><option>50 条 / 页</option></select>
+            </footer>
+          </section>
+        </section>
+
+        <section id="detailView" class="page-view hidden">
+          <div class="page-title">
+            <div>
+              <h1 id="detailHeading">采购需求详情</h1>
+              <span>订单管理 &gt; 采购订单管理 &gt; <b>详情</b></span>
+            </div>
+            <div class="page-actions">
+              <button id="backFromDetail">← 返回</button>
+              <button id="detailApprove">审批</button>
+              <button id="detailEdit" class="primary">编辑</button>
+            </div>
+          </div>
+
+          <section class="detail-shell">
+            <div class="detail-content">
+              <section class="info-block" id="baseInfo">
+                <h2>需求基础信息</h2>
+                <div class="info-grid" id="baseFields"></div>
+              </section>
+
+              <section class="info-block" id="sourceInfo">
+                <h2>来源订单</h2>
+                <div class="info-grid" id="sourceFields"></div>
+              </section>
+
+              <section class="info-block" id="materialInfo">
+                <h2>来源物资项</h2>
+                <div class="table-mini">
+                  <table>
+                    <thead><tr><th>物资名称</th><th>规格</th><th>数量</th><th>单位</th><th>需求原因</th><th>预计单价</th><th>供应商</th><th>到货日期</th></tr></thead>
+                    <tbody id="materialRows"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="info-block" id="supplierInfo">
+                <h2>供应商 / 合同</h2>
+                <div class="info-grid" id="supplierFields"></div>
+              </section>
+
+              <section class="info-block" id="inboundInfo">
+                <h2>入库进度</h2>
+                <div class="task-grid" id="inboundCards"></div>
+                <div class="table-mini compact-table">
+                  <table>
+                    <thead><tr><th>入库单号</th><th>入库日期</th><th>计划数量</th><th>实收数量</th><th>仓库</th><th>验收状态</th><th>成本来源</th></tr></thead>
+                    <tbody id="inboundRows"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="info-block" id="approvalInfo">
+                <h2>审批记录</h2>
+                <ol class="timeline" id="approvalRows"></ol>
+              </section>
+
+              <section class="info-block" id="attachmentInfo">
+                <h2>附件</h2>
+                <div class="file-list" id="fileList"></div>
+              </section>
+            </div>
+            <aside class="anchor">
+              <a href="#baseInfo">基础信息</a>
+              <a href="#sourceInfo">来源订单</a>
+              <a href="#materialInfo">物资项</a>
+              <a href="#supplierInfo">合同供应商</a>
+              <a href="#inboundInfo">入库进度</a>
+              <a href="#approvalInfo">审批记录</a>
+              <a href="#attachmentInfo">附件</a>
+            </aside>
+          </section>
+        </section>
+
+        <section id="editView" class="page-view hidden">
+          <div class="page-title">
+            <div>
+              <h1 id="editHeading">新增采购需求</h1>
+              <span>订单管理 &gt; 采购订单管理 &gt; <b id="editCrumb">新增</b></span>
+            </div>
+            <div class="page-actions">
+              <button id="cancelEdit">取消</button>
+              <button id="saveDraft">保存</button>
+              <button class="primary">提交</button>
+            </div>
+          </div>
+
+          <section class="edit-panel">
+            <section class="info-block">
+              <h2>需求基础信息</h2>
+              <div class="form-grid">
+                <label><span>*</span>需求单号<input id="editCode" value="系统自动生成" disabled /></label>
+                <label><span>*</span>项目<select id="editProject"><option>华东高架 3 标</option><option>沪苏湖站房</option><option>汉江桥梁 2 标</option><option>苏州综合管廊二期</option></select></label>
+                <label><span>*</span>需求类型<select id="editType"><option>采购</option><option>新生产</option></select></label>
+                <label><span>*</span>来源订单<input id="editSourceOrder" value="ZL-202605-018" /></label>
+                <label>来源 BOM<input id="editBom" value="KC-BOM-202605-018" /></label>
+                <label>发起方式<select id="editLaunchMode"><option>订单同步</option><option>手工发起</option></select></label>
+                <label>状态<select id="editStatus"><option>草稿</option><option>待下单</option><option>执行中</option><option>部分入库</option><option>已完成</option><option>已关闭</option></select></label>
+                <label>预计到货日期<input id="editArrival" type="date" value="2026-06-10" /></label>
+                <label>审批状态<select id="editApproval"><option>待提交</option><option>审批中</option><option>已通过</option><option>已退回</option><option>无需审批</option><option>待确认</option></select></label>
+                <label>执行方式<select id="editExecution"><option>线下采购</option><option>线下生产</option></select></label>
+                <label>成本状态<select id="editCost"><option>待录入</option><option>部分录入</option><option>已录入</option><option>待确认</option></select></label>
+              </div>
+            </section>
+
+            <section class="info-block">
+              <h2>供应商 / 合同</h2>
+              <div class="form-grid">
+                <label><span>*</span>供应商<input id="editSupplier" value="湖北桥建钢构有限公司" /></label>
+                <label>联系人<input value="周经理 / 13900005678" /></label>
+                <label>合同编号<input id="editContract" value="KC-CG-2026-0601" /></label>
+                <label>合同金额<input value="¥186,400.00" /></label>
+                <label>报价有效期<input type="date" value="2026-06-20" /></label>
+                <label>结算方式<select><option>按实收数量结算</option><option>按合同数量结算</option><option>按阶段结算</option></select></label>
+                <label class="wide">附件<div class="upload-bar"><button>上传合同</button><button>上传报价</button><button>上传审批附件</button><span>已上传 3 个文件</span></div></label>
+              </div>
+            </section>
+
+            <section class="info-block">
+              <div class="block-title-row">
+                <h2>物资明细</h2>
+                <div class="inline-actions"><button id="bringOrderItems">从订单带入</button><button id="addMaterialLine">新增明细行</button><button>删除选中行</button></div>
+              </div>
+              <div class="table-mini edit-material-table">
+                <table>
+                  <thead><tr><th><input type="checkbox" /></th><th>物资名称</th><th>规格</th><th>数量</th><th>单位</th><th>需求原因</th><th>预计单价</th><th>供应商</th><th>到货日期</th></tr></thead>
+                  <tbody>
+                    <tr><td><input type="checkbox" /></td><td><input value="钢支撑" /></td><td><input value="609x16x6000" /></td><td><input value="48" /></td><td><input value="根" /></td><td><select><option>订单缺口采购</option><option>新生产排产</option><option>手工补充</option></select></td><td><input value="¥1,280.00" /></td><td><input value="湖北桥建钢构有限公司" /></td><td><input type="date" value="2026-06-10" /></td></tr>
+                    <tr><td><input type="checkbox" /></td><td><input value="对拉杆" /></td><td><input value="M24x1200" /></td><td><input value="180" /></td><td><input value="根" /></td><td><select><option>订单缺口采购</option><option>新生产排产</option><option>手工补充</option></select></td><td><input value="¥68.00" /></td><td><input value="湖北桥建钢构有限公司" /></td><td><input type="date" value="2026-06-08" /></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="mask" class="mask hidden"></div>
+    <section id="orderModal" class="modal hidden">
+      <header><h2 id="modalTitle">从订单生成</h2><button class="closeModal">×</button></header>
+      <div class="modal-body" id="modalBody"></div>
+      <footer><button class="closeModal">取消</button><button>保存草稿</button><button class="primary" id="modalPrimary">确认</button></footer>
+    </section>
+
+    <script src="./purchase-orders.js"></script>
+  </body>
+</html>

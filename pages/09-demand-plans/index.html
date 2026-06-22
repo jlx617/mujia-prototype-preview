@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模架工装管理系统 - 需求计划管理</title>
+    <style>
+      :root{--primary:#2eb3ff;--primary-hover:#53c6ff;--primary-light:#e8faff;--success:#00cf61;--warning:#ffb82e;--danger:#ff3b3b;--text:#212529;--muted:#8d97ad;--light:#b7c4cc;--border:#dee1e3;--line:#e9eff4;--bg:#edf1f5;--font:"Microsoft YaHei",Arial,"PingFang SC",Helvetica,sans-serif;--topbar:40px;--sidebar:136px;--row:40px}
+      *{box-sizing:border-box}
+      body{margin:0;background:var(--bg);color:var(--text);font:14px/22px var(--font)}
+      button,input,select,textarea{font:inherit}
+      button{height:32px;padding:0 12px;border:1px solid var(--border);border-radius:3px;background:#fff;color:var(--text);cursor:pointer}
+      button:hover{border-color:var(--primary);color:var(--primary)}
+      button:disabled{border-color:var(--line);background:#f5f7fa;color:var(--light);cursor:not-allowed}
+      .primary{border-color:var(--primary);background:var(--primary);color:#fff}
+      .primary:hover{border-color:var(--primary-hover);background:var(--primary-hover);color:#fff}
+      input,select,textarea{width:100%;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:3px;background:#fff;color:var(--text);outline:none}
+      input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+      input:disabled,textarea:disabled{background:#f5f7fa;color:var(--light)}
+      textarea{height:72px;padding:8px;resize:none}
+      h1,h2,p{margin:0}.hidden{display:none!important}
+      .app-shell{min-height:100vh;padding-top:var(--topbar);padding-left:var(--sidebar)}
+      .global-topbar{position:fixed;z-index:10;top:0;left:0;right:0;height:var(--topbar);display:flex;align-items:center;justify-content:space-between;border-top:3px solid #243f52;border-bottom:1px solid var(--line);background:#fff;padding:0 16px}
+      .brand,.top-tools,.page-actions,.query-actions,.toolbar-actions,.row-actions,.pagination,.block-title-row,.modal footer{display:flex;align-items:center;gap:8px}
+      .brand-mark{width:24px;height:24px;display:grid;place-items:center;border-radius:3px;background:var(--primary);color:#fff;font-weight:600}
+      .brand strong{font-size:15px;font-weight:600}
+      .top-tools{font-size:12px;color:var(--muted)}
+      .top-tools button{height:28px;padding:0 8px;border:0;background:transparent}
+      .role-select{width:156px;height:28px;color:var(--text)}
+      .warehouse-switch{width:148px;height:28px}
+      .notice-dot{position:relative}.notice-dot::after{content:"";position:absolute;top:5px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+      .avatar{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--primary-light);color:var(--primary)}
+      .sidebar{position:fixed;top:var(--topbar);bottom:0;left:0;width:var(--sidebar);border-right:1px solid var(--line);background:#fff;overflow:auto}
+      .collapse{width:100%;height:36px;border:0;border-bottom:1px solid var(--line);border-radius:0;color:var(--muted)}
+      nav{padding:8px 0}.menu-item,.submenu{width:100%;border:0;border-radius:0;background:#fff;text-align:left}
+      .menu-item{height:36px;display:flex;align-items:center;gap:6px;padding:0 8px;font-size:13px}.menu-item i{margin-left:auto;color:var(--muted);font-style:normal}.menu-item.open{color:var(--primary)}
+      .submenu{height:32px;padding:0 8px 0 34px;color:var(--text);font-size:13px}.submenu.active,.submenu:hover{background:var(--primary-light);color:var(--primary)}
+      .page-main{padding:8px 12px 24px;min-width:1220px}
+      .page-title{min-height:40px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 16px;background:#fff;border:1px solid var(--line);border-radius:4px}
+      .page-title h1{display:inline-block;margin-right:12px;font-size:20px;line-height:32px;font-weight:600}.page-title span{color:var(--muted);font-size:12px}.page-title b{color:var(--primary);font-weight:400}
+      .query-panel{display:grid;grid-template-columns:repeat(4,minmax(230px,1fr));gap:12px 16px;margin-bottom:8px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:4px}
+      .query-panel label{display:grid;grid-template-columns:124px minmax(0,1fr);align-items:center;gap:8px;color:var(--muted)}
+      .query-actions{grid-column:1/-1;justify-content:flex-end}
+      .table-shell,.edit-panel,.detail-content{background:#fff;border:1px solid var(--line);border-radius:4px}
+      .table-toolbar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line)}.toolbar-title{font-weight:600}.table-scroll{overflow-x:auto;background:#fff}
+      table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{height:var(--row);padding:0 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}th{background:#f3f6f9;font-weight:600}tbody tr:hover td{background:#fbfdff}
+      .main-table{min-width:1580px}.main-table th:nth-child(1),.main-table td:nth-child(1){width:150px}.main-table th:nth-child(2),.main-table td:nth-child(2){width:84px}.main-table th:nth-child(3),.main-table td:nth-child(3){width:146px}.main-table th:nth-child(4),.main-table td:nth-child(4){width:132px}.main-table th:nth-child(5),.main-table td:nth-child(5){width:76px}.main-table th:nth-child(6),.main-table td:nth-child(6),.main-table th:nth-child(7),.main-table td:nth-child(7){width:124px}.main-table th:nth-child(8),.main-table td:nth-child(8),.main-table th:nth-child(9),.main-table td:nth-child(9){width:94px}.main-table th:nth-child(10),.main-table td:nth-child(10){width:138px}.main-table th:nth-child(11),.main-table td:nth-child(11){width:90px}.main-table th:last-child,.main-table td:last-child{width:180px}
+      .tag{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:3px;background:#f5f7fa;color:var(--muted);font-size:12px}.tag.blue{background:#e8faff;color:#138bc3}.tag.green{background:#e8ffef;color:#128846}.tag.yellow{background:#fffbe8;color:#9b6900}.tag.orange{background:#fff5e8;color:#b65d00}.tag.red{background:#ffece8;color:#b42318}
+      .link-btn{height:24px;padding:0;border:0;background:transparent;color:var(--primary)}.link-btn.danger{color:var(--danger)}
+      .pagination{min-height:48px;justify-content:flex-end;gap:4px;padding:8px 16px;font-size:12px;color:var(--text);white-space:nowrap}.page-total{margin-right:8px;color:var(--muted)}.page-btn{width:24px;height:24px;padding:0}.page-btn.active{border-color:var(--primary);background:var(--primary);color:#fff}.page-size{width:82px;height:28px;margin-left:8px}.page-jump{width:52px;height:28px}
+      .detail-content,.edit-panel{padding:0 16px}.info-block{padding:16px 0;border-bottom:1px solid var(--line)}.info-block:last-child{border-bottom:0}.info-block h2{position:relative;margin-bottom:12px;padding-left:10px;font-size:14px;font-weight:600}.info-block h2::before{content:"";position:absolute;left:0;top:4px;width:3px;height:14px;background:var(--primary)}
+      .block-title-row{justify-content:space-between}.block-title-row h2{margin-bottom:0}.block-title-left{display:flex;align-items:center;gap:12px}
+      .info-grid,.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 40px}.info-item span{display:block;color:var(--muted)}.info-item strong{display:block;min-height:24px;font-weight:400}
+      .info-item.wide{grid-column:span 2}.info-item.full{grid-column:1/-1}
+      .form-item{display:grid;grid-template-columns:108px minmax(0,1fr);align-items:center;column-gap:8px;min-height:32px}.form-label{position:relative;justify-self:end;color:var(--muted);font-size:12px;line-height:20px;text-align:right}.form-item.required .form-label::before{content:"*";margin-right:4px;color:var(--danger)}.form-item.wide{grid-column:span 2}.form-item.full{grid-column:1/-1;align-items:start}.form-item.full .form-label{padding-top:6px}
+      .upload-panel{grid-column:1/-1;min-height:116px;display:grid;place-items:center;border:1px dashed var(--border);border-radius:3px;background:#fbfcfe;text-align:center;color:var(--muted)}.upload-panel strong{display:block;color:var(--text);font-weight:400}.file-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.file-list div{min-height:64px;padding:10px;border:1px solid var(--line);border-radius:3px;background:#fbfcfe}.file-list span,.file-list em{display:block;color:var(--muted);font-style:normal}.file-list strong{display:block;font-weight:600}
+      .table-mini{overflow:auto;border:1px solid var(--line)}.table-mini table{min-width:1180px}.material-detail table,.material-edit table{min-width:1420px}.flow-list{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.flow-card{min-height:84px;padding:12px;border:1px solid var(--line);border-radius:3px;background:#fbfdff}.flow-card span{display:block;color:var(--muted);font-size:12px}.flow-card strong{display:block;margin:4px 0;font-size:15px}.flow-card em{display:block;color:var(--muted);font-style:normal;font-size:12px}
+      .material-edit input,.material-edit select{height:28px}.material-edit input:read-only{background:#f5f7fa;color:#667085}.material-edit th,.material-edit td{width:112px}.material-edit th:nth-child(1),.material-edit td:nth-child(1){width:40px;text-align:center}.material-edit th:nth-child(2),.material-edit td:nth-child(2){width:144px}.material-edit th:nth-child(3),.material-edit td:nth-child(3){width:168px}.material-edit th:nth-child(4),.material-edit td:nth-child(4){width:154px}.material-edit th:nth-child(5),.material-edit td:nth-child(5){width:92px}.material-edit th:nth-child(10),.material-edit td:nth-child(10){width:132px}.material-edit th:nth-child(11),.material-edit td:nth-child(11){width:150px}
+      .empty-state{min-height:256px;display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);text-align:center}.empty-state div{width:48px;height:48px;display:grid;place-items:center;border:1px dashed var(--border);border-radius:3px;color:var(--light);font-size:24px}.empty-state strong{color:var(--text)}
+      .mask{position:fixed;inset:0;z-index:20;background:rgba(36,63,82,.72)}.modal{position:fixed;left:50%;top:50%;z-index:21;width:520px;transform:translate(-50%,-50%);border:1px solid var(--border);border-radius:4px;background:#fff;box-shadow:0 16px 40px rgba(15,23,42,.18)}.modal.product-modal{width:880px}.modal header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line)}.modal header h2{font-size:18px;font-weight:600}.modal header button{width:32px;padding:0}.modal-body{padding:16px}.modal-body label{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:8px;margin-bottom:12px;color:var(--muted)}.modal-body textarea{height:72px}.modal footer{height:56px;justify-content:flex-end;padding:0 16px;border-top:1px solid var(--line)}.product-filter{display:flex;gap:8px;margin-bottom:12px}.product-filter input{flex:1}.product-filter select{width:180px}.product-table{max-height:320px;overflow:auto;border:1px solid var(--line)}.product-table table{min-width:760px}.product-table th:first-child,.product-table td:first-child{width:44px;text-align:center}.product-table th:nth-child(2),.product-table td:nth-child(2){width:120px}.product-table input[type=checkbox]{width:16px;height:16px}.selection-count{margin-right:auto;color:var(--muted)}
+      @media(max-width:1440px){.query-panel{grid-template-columns:repeat(3,minmax(220px,1fr))}.info-grid,.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-list,.file-list{grid-template-columns:repeat(2,1fr)}}
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="global-topbar">
+        <div class="brand"><span class="brand-mark">科</span><strong>模架工装管理系统</strong></div>
+        <div class="top-tools">
+          <select id="roleSelect" class="role-select" aria-label="角色视角">
+            <option value="lease">项目租赁需求方</option>
+            <option value="transfer">项目调拨需求方</option>
+            <option value="leader">项目负责人</option>
+            <option value="warehouse">仓库业务操作角色</option>
+            <option value="approver">审批确认人</option>
+          </select>
+          <select id="warehouseSwitch" class="warehouse-switch hidden" aria-label="当前仓库"><option>上海物料站</option><option>苏州装备中心</option></select>
+          <button>意见反馈</button><button>主题</button><button class="notice-dot">通知</button><span class="avatar" id="avatar">项</span><span id="roleName">项目租赁需求方</span><span>⌄</span>
+        </div>
+      </header>
+      <aside class="sidebar">
+        <button class="collapse">☰</button>
+        <nav>
+          <div class="menu-section"><button class="menu-item"><span>▦</span>基础设置<i>›</i></button><button class="submenu">仓库设置</button><button class="submenu">产品分类</button><button class="submenu">产品清单</button><button class="submenu">BOM 清单</button></div>
+          <div class="menu-section"><button class="menu-item open"><span>▤</span>订单管理<i>⌄</i></button><button class="submenu active">需求计划管理</button><button class="submenu">租赁订单管理</button><button class="submenu">调拨订单管理</button><button class="submenu">采购订单管理</button></div>
+          <div class="menu-section"><button class="menu-item"><span>▥</span>仓库业务<i>›</i></button><button class="submenu">仓库管理</button><button class="submenu">出库</button><button class="submenu">入库</button><button class="submenu">盘点</button><button class="submenu">翻新维保</button><button class="submenu">改制</button></div>
+          <div class="menu-section"><button class="menu-item"><span>□</span>结算分析<i>›</i></button><button class="submenu">外部结算</button><button class="submenu">库存分析</button><button class="submenu">成本分析</button></div>
+        </nav>
+      </aside>
+      <main class="page-main">
+        <section id="listView" class="page-view">
+          <div class="page-title"><div><h1>需求计划管理</h1><span>订单管理 &gt; <b>需求计划管理</b></span></div></div>
+          <section class="query-panel">
+            <label>计划编号<input id="codeFilter" placeholder="请输入计划编号" /></label>
+            <label>计划类型<select id="typeFilter"><option>全部</option><option>租赁</option><option>调拨</option></select></label>
+            <label>项目名称<input id="projectFilter" placeholder="项目名称 / 项目简称" /></label>
+            <label>目标仓库<select id="warehouseFilter"><option>全部</option><option>上海物料站</option><option>苏州装备中心</option><option>华东项目仓库</option></select></label>
+            <label>计划状态<select id="planStatusFilter"><option>全部</option><option>草稿</option><option>待审批</option><option>已通过</option><option>已驳回</option><option>已同步订单</option><option>已关闭</option></select></label>
+            <label>审批状态<select id="approvalFilter"><option>全部</option><option>待提交</option><option>审批中</option><option>通过</option><option>驳回</option></select></label>
+            <label>预计日期<input id="useDateFilter" placeholder="2026-06-01 ~ 2026-06-30" /></label>
+            <label>创建时间<input id="createdFilter" placeholder="2026-05-01 ~ 2026-06-04" /></label>
+            <div class="query-actions"><button id="query" class="primary">查询</button><button id="reset">重置</button></div>
+          </section>
+          <section class="table-shell">
+            <div class="table-toolbar">
+              <div class="toolbar-title">需求计划列表</div>
+              <div class="toolbar-actions">
+                <button id="exportBtn">导出</button>
+                <button id="newTransfer" class="new-action">新增调拨计划</button>
+                <button id="newLease" class="primary new-action">新增租赁计划</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table class="main-table"><thead><tr><th>计划编号</th><th>计划类型</th><th>项目名称</th><th>目标仓库</th><th>物资项数</th><th>预计使用/调拨日期</th><th>预计归还日期</th><th>计划状态</th><th>审批状态</th><th>同步订单</th><th>创建人</th><th>操作</th></tr></thead><tbody id="planRows"></tbody></table>
+              <div id="empty" class="empty-state hidden"><div>∅</div><strong>暂无符合条件的需求计划</strong><p>请调整筛选条件后重新查询。</p></div>
+            </div>
+            <footer class="pagination"><span class="page-total" id="pageTotal">共50条</span><button class="page-btn" aria-label="上一页">‹</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn" aria-label="下一页">›</button><select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select><span>跳至</span><input class="page-jump" value="1" aria-label="跳至页码" /><span>页</span></footer>
+          </section>
+        </section>
+        <section id="detailView" class="page-view hidden">
+          <div class="page-title"><div><h1 id="detailTitle">需求计划详情</h1><span>订单管理 &gt; 需求计划管理 &gt; <b>详情</b></span></div><div class="page-actions"><button id="backFromDetail">‹ 返回</button><button id="detailOrder" class="order-link">查看订单</button><button id="approveBtn" class="approve-action primary">审批通过</button><button id="rejectBtn" class="approve-action">驳回</button></div></div>
+          <section class="detail-content">
+            <section class="info-block"><h2>计划基础信息</h2><div class="info-grid" id="basicInfo"></div></section>
+            <section class="info-block"><h2>需求物资清单</h2><div class="table-mini material-detail"><table><thead><tr><th>物资名称</th><th>规格型号</th><th>需求数量</th><th>单位</th><th>建议来源 BOM</th><th>期望仓库</th><th>预计使用时间</th><th>备注</th></tr></thead><tbody id="materialRows"></tbody></table></div></section>
+            <section class="info-block"><h2>审批记录</h2><div class="flow-list" id="approvalFlow"></div></section>
+            <section class="info-block"><h2>同步订单信息</h2><div class="info-grid" id="syncInfo"></div></section>
+            <section class="info-block"><h2>附件</h2><div class="file-list" id="fileList"></div></section>
+          </section>
+        </section>
+        <section id="editView" class="page-view hidden">
+          <div class="page-title"><div><h1 id="editTitle">新增租赁计划</h1><span>订单管理 &gt; 需求计划管理 &gt; <b id="editCrumb">新增</b></span></div><div class="page-actions"><button id="cancelEdit">取消</button><button id="saveDraft">保存</button><button id="submitApproval" class="primary">提交审批</button></div></div>
+          <section class="edit-panel">
+            <section class="info-block"><h2>计划基础信息</h2><div class="form-grid" id="baseForm"></div></section>
+            <section class="info-block"><div class="block-title-row"><div class="block-title-left"><h2>需求物资清单</h2><div class="toolbar-actions" id="materialAddActions"><button id="selectProducts">添加物资</button><button id="addManualMaterial">手工新增</button></div></div><button id="removeMaterial">删除</button></div><div class="table-mini material-edit"><table><thead id="editMaterialHead"></thead><tbody id="editMaterialRows"></tbody></table></div></section>
+          </section>
+        </section>
+      </main>
+    </div>
+    <div id="mask" class="mask hidden"></div>
+    <section id="confirmModal" class="modal hidden">
+      <header><h2 id="modalTitle">提交审批</h2><button class="closeModal">×</button></header>
+      <div class="modal-body" id="modalBody"></div>
+      <footer><button class="closeModal">取消</button><button id="modalOk" class="primary">确定</button></footer>
+    </section>
+    <script>
+      const plans=[
+        {code:"JH-ZL-202606-006",type:"租赁",project:"华东高架 3 标",warehouse:"上海物料站",items:3,useDate:"2026-06-12",returnDate:"2026-09-30",planStatus:"已同步订单",approval:"通过",order:"ZL-202606-018",creator:"刘工",contact:"刘工 / 13800001234",place:"K18+200-K19+600 高架段",desc:"桥梁上部结构施工周转使用，按项目现场分批进场。",syncTime:"2026-06-02 15:18",syncStatus:"已同步",files:["需求计划说明.pdf","现场平面图.png"]},
+        {code:"JH-DB-202606-004",type:"调拨",project:"苏州综合管廊二期",warehouse:"苏州装备中心",items:2,useDate:"2026-06-08",returnDate:"-",planStatus:"已通过",approval:"通过",order:"待同步",creator:"周工",contact:"周工 / 13700004567",out:"汉江桥梁 2 标项目仓",in:"苏州综合管廊二期项目仓",reason:"项目间周转调拨，满足管廊支撑体系加急需求。",syncTime:"-",syncStatus:"待同步",files:["调拨申请单.docx"]},
+        {code:"JH-ZL-202606-003",type:"租赁",project:"沪苏湖站房",warehouse:"上海物料站",items:4,useDate:"2026-06-20",returnDate:"2026-10-15",planStatus:"待审批",approval:"审批中",order:"-",creator:"陈工",contact:"陈工 / 13900007890",place:"站房西侧雨棚区",desc:"站房雨棚施工支撑体系租赁。",syncTime:"-",syncStatus:"未同步",files:["需求清单.xlsx"]},
+        {code:"JH-DB-202605-021",type:"调拨",project:"汉江桥梁 2 标",warehouse:"华东项目仓库",items:2,useDate:"2026-05-28",returnDate:"-",planStatus:"已驳回",approval:"驳回",order:"-",creator:"赵工",contact:"赵工 / 13600001212",out:"华东项目仓库",in:"汉江桥梁 2 标项目仓",reason:"现场补充调拨。",syncTime:"-",syncStatus:"未同步",files:["驳回前清单.xlsx"]},
+        {code:"JH-ZL-202605-019",type:"租赁",project:"南京北站枢纽",warehouse:"上海物料站",items:1,useDate:"2026-06-05",returnDate:"2026-08-31",planStatus:"草稿",approval:"待提交",order:"-",creator:"王工",contact:"王工 / 13500001111",place:"北广场基坑",desc:"临时支撑材料需求。",syncTime:"-",syncStatus:"未同步",files:[]}
+      ];
+      const materials=[
+        {name:"贝雷片",spec:"321 型 3m Q345",quality:"符合 JT/T 728-2008",unit:"片",budgetPrice:"980.00",budgetQty:"120",planPrice:"950.00",planQty:"120",date:"2026-06-12",remark:"优先按整组发运",qty:"120",bom:"KC-BOM-202605-018 V1",warehouse:"上海物料站"},
+        {name:"钢支撑",spec:"609x16x6000",quality:"Q355B，壁厚偏差≤0.5mm",unit:"根",budgetPrice:"1680.00",budgetQty:"48",planPrice:"1650.00",planQty:"48",date:"2026-06-18",remark:"可分两批到场",qty:"48",bom:"KC-BOM-202605-018 V1",warehouse:"上海物料站"},
+        {name:"标准面板",spec:"1500*3000*6",quality:"表面平整，无明显变形",unit:"块",budgetPrice:"720.00",budgetQty:"32",planPrice:"700.00",planQty:"32",date:"2026-06-20",remark:"现场按订单物资清单确认",qty:"32",bom:"产品清单",warehouse:"上海物料站"}
+      ];
+      const productCatalog=[
+        {code:"CP-BL-001",name:"贝雷片",spec:"321 型 3m Q345",quality:"符合 JT/T 728-2008",unit:"片",price:"950.00"},
+        {code:"CP-ZC-014",name:"钢支撑",spec:"609x16x6000",quality:"Q355B，壁厚偏差≤0.5mm",unit:"根",price:"1650.00"},
+        {code:"CP-MB-008",name:"标准面板",spec:"1500*3000*6",quality:"表面平整，无明显变形",unit:"块",price:"700.00"},
+        {code:"CP-BL-006",name:"贝雷销",spec:"Φ49.5x200",quality:"40Cr 调质处理",unit:"套",price:"38.00"},
+        {code:"CP-ZJ-022",name:"盘扣立杆",spec:"Φ48.3x3.2x2000",quality:"热镀锌，锌层≥65μm",unit:"根",price:"86.00"}
+      ];
+      const $=s=>document.querySelector(s);
+      let current=plans[0],modeType="租赁",modalAction=null;
+      function tag(text){const cls={草稿:"yellow",待审批:"yellow",已通过:"green",已驳回:"red",已同步订单:"blue",已关闭:"",待提交:"yellow",审批中:"blue",通过:"green",驳回:"red",已同步:"green",待同步:"yellow",未同步:""}[text]||"";return `<span class="tag ${cls}">${text}</span>`}
+      function canCreate(){return ["lease","transfer"].includes($("#roleSelect").value)}
+      function canApprove(){return ["leader","approver"].includes($("#roleSelect").value)}
+      function renderList(list=plans){
+        $("#planRows").innerHTML=list.map(p=>`<tr><td>${p.code}</td><td>${tag(p.type)}</td><td>${p.project}</td><td>${p.warehouse}</td><td>${p.items}</td><td>${p.useDate}</td><td>${p.returnDate}</td><td>${tag(p.planStatus)}</td><td>${tag(p.approval)}</td><td>${p.order==="-"?p.order:`<button class="link-btn order">${p.order}</button>`}</td><td>${p.creator}</td><td><div class="row-actions"><button class="link-btn view" data-code="${p.code}">查看</button><button class="link-btn edit" data-code="${p.code}" ${!canCreate()||!["草稿","已驳回"].includes(p.planStatus)?"disabled":""}>编辑</button><button class="link-btn submit" data-code="${p.code}" ${!canCreate()||p.approval!=="待提交"?"disabled":""}>提交审批</button><button class="link-btn danger close" data-code="${p.code}" ${!canCreate()||["已关闭","已同步订单"].includes(p.planStatus)?"disabled":""}>关闭</button></div></td></tr>`).join("");
+        $("#empty").classList.toggle("hidden",list.length>0);$(".main-table").classList.toggle("hidden",list.length===0);$("#pageTotal").textContent="共50条";
+      }
+      function show(view){["#listView","#detailView","#editView"].forEach(v=>$(v).classList.add("hidden"));$(view).classList.remove("hidden");location.hash=view.replace("View","").replace("#","")}
+      function info(label,value,wide=""){return `<div class="info-item ${wide}"><span>${label}</span><strong>${value||"-"}</strong></div>`}
+      function renderDetail(p){
+        current=p;$("#detailTitle").textContent=`${p.code} 需求计划详情`;
+        const basic=p.type==="租赁"?[
+          ["计划编号",p.code],["计划类型",p.type],["项目名称",p.project],["需求方联系人",p.contact],["目标仓库",p.warehouse],["使用地点",p.place],["预计使用开始时间",p.useDate],["预计使用结束时间/归还时间",p.returnDate],["计划状态",tag(p.planStatus)],["审批状态",tag(p.approval)],["需求说明",p.desc,"full"]
+        ]:[
+          ["计划编号",p.code],["计划类型",p.type],["调出仓库/项目",p.out],["调入项目/仓库",p.in],["需求方联系人",p.contact],["预计调拨时间",p.useDate],["计划状态",tag(p.planStatus)],["审批状态",tag(p.approval)],["调拨原因",p.reason,"full"]
+        ];
+        $("#basicInfo").innerHTML=basic.map(x=>info(x[0],x[1],x[2])).join("");
+        $("#materialRows").innerHTML=materials.slice(0,p.items).map(m=>`<tr><td>${m.name}</td><td>${m.spec}</td><td>${m.qty}</td><td>${m.unit}</td><td>${m.bom}</td><td>${m.warehouse}</td><td>${m.date}</td><td>${m.remark}</td></tr>`).join("");
+        $("#approvalFlow").innerHTML=[
+          ["提交人",p.creator,p.approval==="待提交"?"待提交":"已提交"],
+          ["项目负责人",p.approval==="驳回"?"李经理":"李经理",p.approval==="待提交"?"待处理":p.approval==="审批中"?"审批中":p.approval],
+          ["审批确认人",p.approval==="通过"?"沈工":"-",p.approval==="通过"?"已确认":"待处理"],
+          ["处理时间",p.approval==="待提交"?"-":"2026-06-02 14:36",p.approval]
+        ].map(x=>`<div class="flow-card"><span>${x[0]}</span><strong>${x[1]}</strong><em>${x[2]}</em></div>`).join("");
+        $("#syncInfo").innerHTML=[["同步订单编号",p.order==="-"?"-":p.order],["同步时间",p.syncTime],["同步状态",tag(p.syncStatus)]].map(x=>info(x[0],x[1])).join("");
+        $("#fileList").innerHTML=(p.files.length?p.files:["暂无附件"]).map(f=>`<div><span>附件</span><strong>${f}</strong><em>${p.creator}</em></div>`).join("");
+        $(".order-link").disabled=!p.order||p.order==="-"||p.order==="待同步";document.querySelectorAll(".approve-action").forEach(b=>b.classList.toggle("hidden",!canApprove()||p.approval!=="审批中"));
+      }
+      function formItem(label,control,required=false,extra=""){return `<label class="form-item ${required?"required":""} ${extra}"><span class="form-label">${label}</span>${control}</label>`}
+      function leaseMaterialRow(m={},source="manual"){
+        const locked=source==="catalog"?"readonly":"";
+        return `<tr data-source="${source}"><td><input class="material-check" type="checkbox" aria-label="选择物资行" /></td><td><input value="${m.name||""}" placeholder="请输入物资名称" ${locked} /></td><td><input value="${m.spec||""}" placeholder="请输入规格型号" ${locked} /></td><td><input value="${m.quality||""}" placeholder="请输入质量要求" /></td><td><input value="${m.unit||""}" placeholder="单位" /></td><td><input type="number" min="0" step="0.01" value="${m.budgetPrice||""}" placeholder="0.00" /></td><td><input type="number" min="0" step="0.01" value="${m.budgetQty||""}" placeholder="0" /></td><td><input type="number" min="0" step="0.01" value="${m.planPrice||m.price||""}" placeholder="0.00" /></td><td><input type="number" min="0" step="0.01" value="${m.planQty||""}" placeholder="0" /></td><td><input type="date" value="${m.date||"2026-06-12"}" /></td><td><input value="${m.remark||""}" placeholder="备注" /></td></tr>`;
+      }
+      function transferMaterialRow(m={}){
+        return `<tr><td><input class="material-check" type="checkbox" aria-label="选择物资行" /></td><td><input value="${m.name||""}" /></td><td><input value="${m.spec||""}" /></td><td><input value="${m.qty||1}" /></td><td><input value="${m.unit||""}" /></td><td><input value="${m.bom||""}" /></td><td><select><option>${m.warehouse||"上海物料站"}</option><option>苏州装备中心</option></select></td><td><input type="date" value="${m.date||"2026-06-12"}" /></td><td><input value="${m.remark||""}" /></td></tr>`;
+      }
+      function renderEdit(type="租赁",p=null){
+        modeType=type;$("#editTitle").textContent=p?`编辑${type}计划`:`新增${type}计划`;$("#editCrumb").textContent=p?"编辑":"新增";
+        const common=formItem("计划编号",`<input value="${p?p.code:"系统自动生成"}" disabled />`,true)+formItem("项目名称",`<select><option>${p?p.project:"华东高架 3 标"}</option><option>沪苏湖站房</option><option>苏州综合管廊二期</option></select>`,true)+formItem("需求方联系人",`<input value="${p?p.contact:"刘工 / 13800001234"}" />`,true);
+        $("#baseForm").innerHTML= type==="租赁"
+          ? common+formItem("目标仓库",`<select><option>${p?p.warehouse:"上海物料站"}</option><option>苏州装备中心</option></select>`,true)+formItem("使用地点",`<input value="${p?p.place:"K18+200-K19+600 高架段"}" />`,true)+formItem("预计使用开始",`<input type="date" value="${p?p.useDate:"2026-06-12"}" />`,true)+formItem("预计归还时间",`<input type="date" value="${p&&p.returnDate!=="-"?p.returnDate:"2026-09-30"}" />`,true)+formItem("需求说明",`<textarea>${p?p.desc:""}</textarea>`,false,"full")+`<div class="upload-panel"><div><strong>上传附件</strong><span>支持需求说明、现场图片、清单文件</span></div></div>`
+          : formItem("计划编号",`<input value="${p?p.code:"系统自动生成"}" disabled />`,true)+formItem("调出仓库/项目",`<select><option>${p?p.out:"汉江桥梁 2 标项目仓"}</option><option>华东项目仓库</option></select>`,true)+formItem("调入项目/仓库",`<select><option>${p?p.in:"苏州综合管廊二期项目仓"}</option><option>沪苏湖站房项目仓</option></select>`,true)+formItem("需求方联系人",`<input value="${p?p.contact:"周工 / 13700004567"}" />`,true)+formItem("预计调拨时间",`<input type="date" value="${p?p.useDate:"2026-06-08"}" />`,true)+formItem("调拨原因",`<textarea>${p?p.reason:""}</textarea>`,true,"full")+`<div class="upload-panel"><div><strong>上传附件</strong><span>支持调拨申请、现场确认材料</span></div></div>`;
+        if(type==="租赁"){
+          $("#editMaterialHead").innerHTML="<tr><th><input id=\"checkAllMaterials\" type=\"checkbox\" aria-label=\"全选物资\" /></th><th>物资名称</th><th>规格型号</th><th>质量要求</th><th>计量单位</th><th>预算单价</th><th>预算量</th><th>计划单价</th><th>计划量</th><th>进场时间</th><th>备注</th></tr>";
+          $("#editMaterialRows").innerHTML=p?materials.slice(0,p.items).map(m=>leaseMaterialRow(m,"catalog")).join(""):"";
+          $("#selectProducts").textContent="添加物资";$("#selectProducts").classList.remove("hidden");$("#addManualMaterial").classList.remove("hidden");
+        }else{
+          $("#editMaterialHead").innerHTML="<tr><th><input id=\"checkAllMaterials\" type=\"checkbox\" aria-label=\"全选物资\" /></th><th>物资名称</th><th>规格型号</th><th>需求数量</th><th>单位</th><th>建议来源 BOM</th><th>期望仓库</th><th>预计使用时间</th><th>备注</th></tr>";
+          $("#editMaterialRows").innerHTML=materials.slice(0,p?p.items:2).map(transferMaterialRow).join("");
+          $("#selectProducts").classList.add("hidden");$("#addManualMaterial").textContent="新增物资";
+        }
+      }
+      function openModal(title,body,ok="确定",action=null,wide=false){modalAction=action;document.querySelectorAll(".selection-count").forEach(el=>el.remove());$("#modalTitle").textContent=title;$("#modalBody").innerHTML=body;$("#modalOk").textContent=ok;$("#confirmModal").classList.toggle("product-modal",wide);$("#mask").classList.remove("hidden");$("#confirmModal").classList.remove("hidden")}
+      function closeModal(){modalAction=null;$("#mask").classList.add("hidden");$("#confirmModal").classList.add("hidden");$("#confirmModal").classList.remove("product-modal")}
+      function openProductSelector(){
+        const rows=productCatalog.map((p,i)=>`<tr><td><input class="product-check" type="checkbox" data-code="${p.code}" ${i<3?"checked":""} /></td><td>${p.code}</td><td>${p.name}</td><td>${p.spec}</td><td>${p.quality}</td><td>${p.unit}</td><td>¥${p.price}</td></tr>`).join("");
+        openModal("选择产品清单",`<div class="product-filter"><input id="productKeyword" placeholder="产品编号 / 物资名称 / 规格型号" /><select><option>全部产品分类</option><option>桥梁模架</option><option>支撑体系</option></select><button id="searchProducts">查询</button></div><div class="product-table"><table><thead><tr><th>选择</th><th>产品编号</th><th>物资名称</th><th>规格型号</th><th>质量要求</th><th>单位</th><th>参考单价</th></tr></thead><tbody>${rows}</tbody></table></div>`,`带入所选`,()=>{
+          const selected=[...document.querySelectorAll(".product-check:checked")].map(c=>productCatalog.find(p=>p.code===c.dataset.code));
+          $("#editMaterialRows").insertAdjacentHTML("beforeend",selected.map(p=>leaseMaterialRow({...p,budgetPrice:p.price,budgetQty:"1",planQty:"1"},"catalog")).join(""));
+        },true);
+        $("#confirmModal footer").insertAdjacentHTML("afterbegin",`<span class="selection-count">已选择 <b id="selectedProductCount">3</b> 项</span>`);
+      }
+      document.addEventListener("click",e=>{
+        const code=e.target.dataset.code,p=plans.find(x=>x.code===code);
+        if(e.target.matches(".view")){renderDetail(p);show("#detailView")}
+        if(e.target.matches(".edit")){renderEdit(p.type,p);show("#editView")}
+        if(e.target.matches(".submit"))openModal("提交审批",`<label>计划编号<input value="${code}" disabled></label><label>审批意见<textarea>请项目负责人确认需求计划。</textarea></label>`,"提交");
+        if(e.target.matches(".close"))openModal("关闭计划",`<label>计划编号<input value="${code}" disabled></label><label>关闭原因<textarea placeholder="请输入关闭原因"></textarea></label>`,"关闭");
+        if(e.target.matches(".order")||e.target.id==="detailOrder")openModal("查看订单",`<label>订单编号<input value="${current.order||e.target.textContent}" disabled></label><label>订单类型<input value="${current.type}订单" disabled></label>`,"进入订单");
+        if(e.target.id==="backFromDetail"||e.target.id==="cancelEdit")show("#listView");
+        if(e.target.id==="newLease"){renderEdit("租赁");show("#editView")}
+        if(e.target.id==="newTransfer"){renderEdit("调拨");show("#editView")}
+        if(e.target.id==="saveDraft")openModal("保存草稿",`<label>计划类型<input value="${modeType}" disabled></label><label>保存结果<input value="草稿已保存" disabled></label>`);
+        if(e.target.id==="submitApproval")openModal("提交审批",`<label>计划类型<input value="${modeType}" disabled></label><label>审批意见<textarea>提交项目负责人审批。</textarea></label>`,"提交");
+        if(e.target.id==="approveBtn")openModal("审批通过",`<label>计划编号<input value="${current.code}" disabled></label><label>审批意见<textarea>同意本次需求计划。</textarea></label>`,"通过");
+        if(e.target.id==="rejectBtn")openModal("驳回计划",`<label>计划编号<input value="${current.code}" disabled></label><label>驳回原因<textarea placeholder="请输入驳回原因"></textarea></label>`,"驳回");
+        if(e.target.id==="exportBtn")openModal("导出",`<label>导出范围<input value="当前筛选结果" disabled></label><label>文件类型<input value="需求计划台账 Excel" disabled></label>`,"导出");
+        if(e.target.id==="selectProducts")openProductSelector();
+        if(e.target.id==="addManualMaterial")$("#editMaterialRows").insertAdjacentHTML("beforeend",modeType==="租赁"?leaseMaterialRow() : transferMaterialRow());
+        if(e.target.id==="removeMaterial")document.querySelectorAll("#editMaterialRows .material-check:checked").forEach(c=>c.closest("tr").remove());
+        if(e.target.id==="checkAllMaterials")document.querySelectorAll("#editMaterialRows .material-check").forEach(c=>c.checked=e.target.checked);
+        if(e.target.matches(".product-check")){$("#selectedProductCount").textContent=document.querySelectorAll(".product-check:checked").length}
+        if(e.target.id==="searchProducts"){const keyword=$("#productKeyword").value.trim().toLowerCase();document.querySelectorAll(".product-table tbody tr").forEach(row=>row.classList.toggle("hidden",keyword&&!row.textContent.toLowerCase().includes(keyword)))}
+        if(e.target.matches(".closeModal")||e.target.id==="mask")closeModal();
+        if(e.target.id==="modalOk"){if(modalAction)modalAction();closeModal()}
+      });
+      $("#query").addEventListener("click",()=>{const code=$("#codeFilter").value.trim(),type=$("#typeFilter").value,status=$("#planStatusFilter").value;renderList(plans.filter(p=>(!code||p.code.includes(code))&&(type==="全部"||p.type===type)&&(status==="全部"||p.planStatus===status)))});
+      $("#reset").addEventListener("click",()=>{$(".query-panel").querySelectorAll("input").forEach(i=>i.value="");$(".query-panel").querySelectorAll("select").forEach(s=>s.selectedIndex=0);renderList()});
+      function updateRoleUI(){
+        const role=$("#roleSelect").value,name=$("#roleSelect").selectedOptions[0].textContent;
+        $("#roleName").textContent=name;$("#avatar").textContent=name[0];$("#warehouseSwitch").classList.toggle("hidden",role!=="warehouse");
+        document.querySelectorAll(".new-action").forEach(b=>b.classList.toggle("hidden",!canCreate()));
+        renderList();if(!canCreate()&&$("#editView:not(.hidden)"))show("#listView");
+      }
+      $("#roleSelect").addEventListener("change",updateRoleUI);
+      updateRoleUI();
+      renderList();
+      if(location.hash==="#edit"){renderEdit("租赁");show("#editView")}
+    </script>
+  </body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 产品分类</title>
+  <link rel="stylesheet" href="../../shared/product-category.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="logo">科</div>
+      <strong>模架工装管理系统</strong>
+      <div class="top-tools">
+        <button>意见反馈</button>
+        <button>主题</button>
+        <button class="bell">通知<i></i></button>
+        <span class="avatar">管</span>
+        <span>中心管理员</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="collapse">☰</button>
+      <nav>
+        <div class="menu-group open">
+          <div class="menu-title active">▣ 基础设置 <span>⌄</span></div>
+          <a>仓库设置</a>
+          <a class="current">产品分类</a>
+          <a>产品清单</a>
+          <a>BOM 清单</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-title">▦ 仓库业务 <span>›</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="menu-title">◫ 统计分析 <span>›</span></div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section id="listView" class="page-view active">
+        <div class="page-title">
+          <h1>产品分类</h1>
+          <span>基础设置 &gt; 产品管理 &gt; <b>产品分类</b></span>
+        </div>
+
+        <div class="tree-table-layout">
+          <section class="list-area">
+            <form class="filter-panel">
+              <label>分类编码<input id="codeKeyword" placeholder="请输入分类编码"></label>
+              <label>分类名称<input id="nameKeyword" placeholder="请输入分类名称"></label>
+              <div class="filter-actions">
+                <button type="button" class="primary" id="search">查询</button>
+                <button type="button" id="reset">重置</button>
+              </div>
+            </form>
+
+            <section class="table-panel">
+              <div class="toolbar">
+                <div>
+                  <strong id="tableTitle">分类层级列表</strong>
+                  <span id="totalText">共 0 条</span>
+                </div>
+                <div class="toolbar-actions">
+                  <button id="exportBtn">导出</button>
+                  <button id="batchAddBtn">批量新增</button>
+                  <button class="primary" id="addRootBtn">新增</button>
+                </div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th><input type="checkbox"></th>
+                    <th>分类编码</th>
+                    <th>分类名称</th>
+                    <th>关联产品数量</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+              <div id="emptyState" class="empty-state hidden">
+                <strong>无符合条件分类</strong>
+                <span>可调整筛选条件后重新查询。</span>
+              </div>
+              <div id="loadingState" class="empty-state hidden">
+                <strong>数据加载中</strong>
+                <span>正在获取分类数据。</span>
+              </div>
+              <div id="noPermissionState" class="empty-state hidden">
+                <strong>暂无操作权限</strong>
+                <span>当前账号可查看分类，新增、编辑、删除需中心主数据管理员权限。</span>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section id="editView" class="page-view">
+        <div class="page-title edit-title">
+          <div>
+            <h1 id="editTitle">编辑分类</h1>
+            <span>基础设置 &gt; 产品管理 &gt; 产品分类 &gt; <b id="editCrumb">编辑</b></span>
+          </div>
+          <div class="page-actions">
+            <button id="cancelEdit">取消</button>
+            <button id="saveDraft">保存</button>
+            <button class="primary" id="submitEdit">提交</button>
+          </div>
+        </div>
+
+        <form class="edit-form">
+          <section class="form-section">
+            <h2>基础信息</h2>
+            <div class="form-grid">
+              <label><span>分类编码</span><input id="formCode" value="MJ-DS-001" placeholder="手动输入分类编码"></label>
+              <label><span>分类名称</span><input id="formName" value="墩身标准节"></label>
+              <label><span>上级分类</span><select id="formParent"><option value="">无</option><option>模架体系</option><option>墩身</option><option>承台</option><option>系梁</option><option>平模</option><option>集成工装</option><option>造楼机</option><option>台车</option><option>大型设备</option></select></label>
+              <label><span>层级</span><input id="formLevel" value="三级" disabled></label>
+              <label><span>排序</span><input id="formSort" value="10"></label>
+              <label><span>状态</span><select id="formState"><option>启用</option><option>禁用</option></select></label>
+              <label><span>维护人</span><input id="formOwner" value="中心主数据管理员"></label>
+              <label class="wide"><span>备注</span><textarea id="formRemark">标准分类维护记录。</textarea></label>
+            </div>
+          </section>
+
+          <section class="form-section" id="specSection">
+            <div class="section-title-row">
+              <div>
+                <h2>规格型号配置</h2>
+                <p id="specHelp">仅末级分类可维护；勾选必填后新增产品必须选择，勾选用于搜索后会出现在资产地图、资产仓库筛选项中。</p>
+              </div>
+              <button type="button" id="addSpecBtn">新增规格</button>
+            </div>
+            <div id="specReadonly" class="spec-readonly hidden">
+              当前分类不是末级分类，仅维护基础信息。请在末级分类中维护规格和型号。
+            </div>
+            <div id="specList" class="spec-list"></div>
+            <div id="specEmpty" class="spec-empty hidden">
+              <strong>暂未配置规格</strong>
+              <span>可新增规格，并在规格下维护多个型号。</span>
+            </div>
+          </section>
+
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="mask" class="mask hidden"></div>
+
+  <section id="batchAddModal" class="modal hidden">
+    <header><h2>批量新增分类</h2><button id="closeBatchAdd">×</button></header>
+    <div class="modal-body">
+      <div class="batch-steps">
+        <div class="batch-step">
+          <b>步骤一</b>
+          <strong>下载模板</strong>
+          <p>按模板维护分类编码、分类名称、上级分类编码、排序、状态、备注。</p>
+          <button>下载模板</button>
+        </div>
+        <div class="batch-step">
+          <b>步骤二</b>
+          <strong>上传模板</strong>
+          <p>上传后校验编码重复、父级是否存在、层级是否超过 10 级。</p>
+          <button class="primary">选择文件</button>
+        </div>
+      </div>
+      <div class="check-list">
+        <span>编码重复校验</span>
+        <span>上级分类校验</span>
+        <span>层级上限校验</span>
+      </div>
+    </div>
+    <footer><button id="cancelBatchAdd">取消</button><button class="primary">开始上传</button></footer>
+  </section>
+
+  <section id="confirmModal" class="modal small hidden">
+    <header><h2 id="confirmTitle">停用确认</h2><button id="closeConfirm">×</button></header>
+    <div class="modal-body">
+      <p id="confirmText">停用后该分类不可再被新产品或 BOM 引用。</p>
+      <div class="status-list">
+        <span>确认状态：待确认</span>
+        <span id="confirmLinkText">关联产品：3 个</span>
+      </div>
+    </div>
+    <footer><button id="cancelConfirm">取消</button><button class="danger" id="confirmOk">确认停用</button></footer>
+  </section>
+
+  <section id="errorModal" class="modal small hidden">
+    <header><h2>异常状态</h2><button id="closeError">×</button></header>
+    <div class="modal-body">
+      <p>存在 2 条分类状态异常。</p>
+      <div class="status-list">
+        <span>MJ-XL-001 系梁侧模：规则状态待确认</span>
+        <span>GZ-TC-002 液压台车：父级停用联动检查</span>
+      </div>
+    </div>
+    <footer><button class="primary" id="errorOk">知道了</button></footer>
+  </section>
+
+  <script src="../../shared/product-category.js"></script>
+</body>
+</html>

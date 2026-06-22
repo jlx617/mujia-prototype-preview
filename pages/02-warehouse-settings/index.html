@@ -1,0 +1,135 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模架工装管理系统 - 仓库设置</title>
+    <link rel="stylesheet" href="../../shared/warehouse-settings.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="side">
+        <div class="brand"><b>科</b><span>模架工装管理系统<small>一期：科创业务闭环</small></span></div>
+        <nav>
+          <p>基础设置</p>
+          <button class="on">仓库设置</button><button>产品分类</button><button>产品管理/资产档案</button><button>租赁规则设置</button>
+          <p>仓库业务</p>
+          <button>入库管理</button><button>出库管理</button><button>盘点管理</button><button>翻新/维修记录</button>
+          <p>统计分析</p>
+          <button>库存/资产利用率</button><button>成本分析</button>
+        </nav>
+      </aside>
+      <main>
+        <header class="top">
+          <div class="crumb">基础设置 / <strong>仓库设置</strong></div>
+          <div><span>当前公司：科创公司</span><button class="btn-secondary">消息 <i>3</i></button><button class="btn-secondary">帮助</button><em>仓</em></div>
+        </header>
+        <section class="head">
+          <div><h1>仓库设置</h1><p>基础设置/仓库设置</p></div>
+        </section>
+        <section class="work page-view active" id="listPage">
+          <aside class="tree">
+            <div class="panel-title"><b>组织</b></div>
+            <div class="tree-tools">
+              <input id="orgSearch" placeholder="请输入关键字" />
+              <select aria-label="组织层级"><option>全部</option><option>一级</option></select>
+            </div>
+            <ul class="org-tree">
+              <li class="org-node sel" data-company="科创公司"><span class="node-main"><span class="tree-toggle">▾</span><span class="folder-icon"></span>科创公司</span><span>4</span></li>
+              <li class="org-node org-child" data-company="路桥公司"><span class="node-main"><span class="tree-toggle">▸</span><span class="folder-icon"></span>路桥公司</span><span>1</span></li>
+              <li class="org-node org-child" data-company="发展公司"><span class="node-main"><span class="tree-toggle">▸</span><span class="folder-icon"></span>发展公司</span><span>0</span></li>
+              <li class="org-node org-child" data-company="一公司基础公司"><span class="node-main"><span class="tree-toggle">▸</span><span class="folder-icon"></span>一公司基础公司</span><span>0</span></li>
+              <li class="org-node org-child" data-company="三公司桥梁事业部"><span class="node-main"><span class="tree-toggle">▸</span><span class="folder-icon"></span>三公司桥梁事业部</span><span>0</span></li>
+            </ul>
+          </aside>
+          <section class="content">
+            <form class="filters">
+              <label>仓库名称/编码<input id="keyword" placeholder="请输入仓库名称或编码" /></label>
+              <label>启用状态<select id="status"><option>全部</option><option>启用</option><option>停用</option></select></label>
+              <label>负责人<input id="owner" placeholder="姓名/手机号" /></label>
+              <label>地区<select id="region"><option>全部</option><option>上海市</option><option>江苏省</option><option>安徽省</option><option>四川省</option></select></label>
+              <div><button type="button" class="primary" id="query">查询</button><button type="button" class="btn-secondary" id="reset">重置</button></div>
+            </form>
+            <div class="toolbar">
+              <div><b>仓库列表</b></div>
+              <div><button class="primary" id="add">新增仓库</button></div>
+            </div>
+            <div class="tablebox">
+              <table>
+                <thead><tr><th><input type="checkbox"></th><th>仓库编码</th><th>仓库名称</th><th>所属公司</th><th>地址</th><th>负责人</th><th>库区数</th><th>库位数</th><th>启用状态</th><th>操作</th></tr></thead>
+                <tbody id="rows"></tbody>
+              </table>
+              <div class="table-empty" id="empty"><strong>暂无仓库数据</strong><span>可调整筛选条件，或新增物料站/装备中心/项目虚拟仓。</span></div>
+            </div>
+            <div class="pager"><span id="summary">共 0 条</span><button>上一页</button><button class="page">1</button><button>2</button><button>下一页</button></div>
+          </section>
+        </section>
+        <section class="detail-page page-view" id="detailPage">
+          <div class="page-titlebar">
+            <div><h1 id="detailPageTitle">仓库详情</h1><p>基础设置 &gt; 仓库设置 &gt; 查看详情</p></div>
+            <button class="btn-secondary" id="detailBack">← 返回</button>
+          </div>
+          <div class="detail-layout">
+            <div class="detail-main">
+            <section class="info-block">
+              <h2>基础信息</h2>
+              <div class="detail-summary" id="detailSummary"></div>
+              </section>
+              <section class="info-block">
+                <h2>库区/库位</h2>
+                <div class="location-tree" id="locationTree"></div>
+              </section>
+            </div>
+            <aside class="anchor-nav"><a class="active">基础信息</a><a>库区/库位</a></aside>
+          </div>
+        </section>
+        <section class="edit-page page-view" id="editPage">
+          <div class="page-titlebar">
+            <div><h1 id="editPageTitle">新增仓库</h1><p>基础设置 &gt; 仓库设置 &gt; 新增/编辑</p></div>
+            <div class="page-actions"><button class="btn-secondary" id="editCancel">取消</button><button class="btn-secondary">保存</button><button class="primary" id="editSubmit">提交</button></div>
+          </div>
+          <div class="edit-main">
+            <section class="info-block">
+              <h2>基础信息</h2>
+              <div class="grid warehouse-edit-grid"><label><span class="required">*</span>仓库名称<input placeholder="请输入仓库名称"></label><label><span class="required">*</span>负责人<input value="陈工"></label><label><span class="required">*</span>联系电话<input value="138****2046"></label></div>
+            </section>
+            <section class="info-block">
+              <h2>仓库定位</h2>
+              <label>详细地址<input value="上海市嘉定区安亭镇模架周转基地 2 号门"></label>
+              <div class="map"><b>定位点</b><span>地图定位占位：经度 121.1642，纬度 31.2941</span></div>
+            </section>
+          </div>
+        </section>
+        <section class="zone-page page-view" id="zonePage">
+          <div class="page-titlebar">
+            <div><h1 id="zonePageTitle">库区/库位维护</h1><p>基础设置 &gt; 仓库设置 &gt; 库区/库位</p></div>
+            <div class="page-actions"><button class="btn-secondary" id="zoneBack">返回</button><button class="btn-secondary">保存</button><button class="primary" id="zoneSubmit">提交</button></div>
+          </div>
+          <div class="zone-layout">
+            <section class="info-block zone-tree-panel">
+              <h2>库区库位层级</h2>
+              <div class="zone-actions"><button class="primary" id="addAreaBtn" type="button">新增库区</button></div>
+              <div class="zone-tree" id="zoneTree"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="mask" id="mask"></div>
+    <div class="modal form-modal" id="zoneModal">
+      <div><b id="zoneModalTitle">新增库区</b><button class="icon-btn" id="zoneModalClose">×</button></div>
+      <section>
+        <label>所属仓库<input id="zoneWarehouseName" value="上海物料站" disabled></label>
+        <label id="parentNodeField">上级库区<select><option>储存区 A</option><option>待检区 B</option><option>翻新区 C</option><option>废品区 D</option></select></label>
+        <label id="zoneTypeField">分类<select id="zoneType"><option>储存区</option><option>待检区</option><option>翻新区</option><option>废品区</option></select></label>
+        <label>名称<input id="zoneName" value="储存区 A"></label>
+        <label>排序<input id="zoneSort" type="number" min="1" value="1"></label>
+        <label>启用状态<select><option>已启用</option><option>已禁用</option></select></label>
+      </section>
+      <footer><button class="btn-secondary" id="zoneModalCancel">× 取消</button><button class="primary" id="zoneModalOk">✓ 确定</button></footer>
+    </div>
+    <div class="modal confirm-modal" id="modal"><div><b id="modalTitle">信息提示</b><button class="icon-btn" id="mclose">×</button></div><section><span class="warn-icon">!</span></section><p id="modalText">仓库内存在物资不可操作。</p><footer><button class="primary" id="mok">✓ 确认</button></footer></div>
+    <script src="../../shared/warehouse-settings.js"></script>
+  </body>
+</html>
+

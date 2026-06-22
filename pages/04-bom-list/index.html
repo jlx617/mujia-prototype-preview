@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模架工装管理系统 - BOM 清单</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="global-topbar">
+        <div class="brand">
+          <span class="brand-mark">科</span>
+          <strong>模架工装管理系统</strong>
+        </div>
+        <div class="top-tools">
+          <button>帮助</button>
+          <button class="notice-dot">通知</button>
+          <span class="avatar">主</span>
+          <span>中心主数据管理员</span>
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <button class="collapse">≡</button>
+        <nav>
+          <div class="menu-section">
+            <button class="menu-item open"><span>▦</span>基础设置<i>⌄</i></button>
+            <button class="submenu">仓库设置</button>
+            <button class="submenu">产品分类</button>
+            <button class="submenu">产品清单</button>
+            <button class="submenu active">BOM 清单</button>
+          </div>
+          <div class="menu-section">
+            <button class="menu-item"><span>▤</span>订单管理<i>›</i></button>
+            <button class="submenu">需求计划管理</button>
+            <button class="submenu">租赁订单管理</button>
+            <button class="submenu">调拨订单管理</button>
+          </div>
+          <div class="menu-section">
+            <button class="menu-item"><span>▥</span>仓储作业<i>›</i></button>
+            <button class="submenu">出库</button>
+            <button class="submenu">入库</button>
+            <button class="submenu">盘点</button>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="page-main">
+        <section id="listView" class="page-view">
+          <div class="page-title">
+            <div>
+              <h1>BOM 清单</h1>
+              <span>基础设置 &gt; 产品清单 &gt; <b>BOM 清单</b></span>
+            </div>
+          </div>
+
+          <section class="query-panel">
+            <label>BOM<input id="bomFilter" placeholder="BOM 名称 / 编号" /></label>
+            <label>适用品类<select id="categoryFilter"><option>全部</option><option>墩身模板</option><option>承台模板</option><option>隧道台车</option><option>造楼机</option><option>液压系统</option></select></label>
+            <label>维护仓库<select id="warehouseFilter"><option>全部</option><option>中心标准库</option><option>上海周转仓</option><option>苏州装备仓</option></select></label>
+            <label>维护人员<select id="ownerFilter"><option>全部</option><option>张工</option><option>李工</option><option>周工</option><option>王工</option></select></label>
+            <label>版本状态<select id="statusFilter"><option>全部</option><option>草稿</option><option>待确认</option><option>已确认</option><option>已停用</option></select></label>
+            <label>更新时间<input id="dateFilter" type="date" /></label>
+            <div class="query-actions">
+              <button id="query" class="primary">查询</button>
+              <button id="reset">重置</button>
+            </div>
+          </section>
+
+          <section class="table-panel">
+            <div class="table-toolbar">
+              <div class="toolbar-title">仓库 BOM 主数据</div>
+              <div class="toolbar-actions">
+                <button id="importBom">导入 Excel</button>
+                <button id="copyBom">复制生成新版本</button>
+                <button id="confirmBom">确认版本</button>
+                <button id="newBom" class="primary">新增 BOM</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" /></th>
+                    <th data-sort="code">BOM 编号</th>
+                    <th data-sort="name">BOM 名称</th>
+                    <th>适用品类</th>
+                    <th>当前版本</th>
+                    <th data-sort="items">产品项数</th>
+                    <th data-sort="weight">预计重量</th>
+                    <th>维护人员</th>
+                    <th>版本状态</th>
+                    <th>维护仓库</th>
+                    <th>来源方式</th>
+                    <th>最近更新</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="bomRows"></tbody>
+              </table>
+              <div id="empty" class="empty hidden">
+                <div>∅</div>
+                <strong>暂无符合条件的 BOM</strong>
+                <p>请调整筛选条件，或新增 / 导入 BOM 清单。</p>
+              </div>
+            </div>
+            <footer class="pager">
+              <span id="pageSummary">共 0 条</span>
+              <button>上一页</button>
+              <button class="current">1</button>
+              <button>2</button>
+              <button>下一页</button>
+              <select><option>10 条 / 页</option><option>20 条 / 页</option></select>
+              <label>跳至<input value="1" /></label>
+              <button>确定</button>
+            </footer>
+          </section>
+        </section>
+
+        <section id="detailView" class="page-view hidden">
+          <div class="page-title">
+            <div>
+              <h1 id="detailHeading">BOM 详情</h1>
+              <span>基础设置 &gt; 产品清单 &gt; BOM 清单 &gt; <b>详情</b></span>
+            </div>
+            <div class="page-actions">
+              <button id="backFromDetail">返回</button>
+              <button id="detailAttachment">查看设计附件</button>
+              <button id="detailCopy">复制生成新版本</button>
+              <button id="detailEdit" class="primary">编辑</button>
+            </div>
+          </div>
+
+          <section class="detail-content">
+            <section class="info-block">
+              <h2>基础信息</h2>
+              <div class="info-grid" id="basicFields"></div>
+            </section>
+            <section class="info-block">
+              <h2>BOM 层级清单</h2>
+              <div class="tree-table-wrap">
+                <table class="tree-table">
+                  <thead>
+                    <tr>
+                      <th>层级</th>
+                      <th>名称</th>
+                      <th>规格</th>
+                      <th>数量</th>
+                      <th>单位</th>
+                      <th>单重</th>
+                      <th>总重</th>
+                      <th>备注</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailTreeRows"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="info-block">
+              <h2>版本记录</h2>
+              <table class="version-table">
+                <thead><tr><th>版本号</th><th>生成方式</th><th>维护人</th><th>确认状态</th><th>更新时间</th><th>操作</th></tr></thead>
+                <tbody id="versionRows"></tbody>
+              </table>
+            </section>
+            <section class="info-block" id="attachInfo">
+              <h2>设计附件</h2>
+              <div class="file-list">
+                <div><span>总装图 PDF</span><strong>墩身模板总装图.pdf</strong><em>已上传</em></div>
+                <div><span>加工图 DWG</span><strong>标准节加工图.dwg</strong><em>已上传</em></div>
+                <div><span>导入原始 Excel</span><strong>BOM导入原始清单.xlsx</strong><em>已归档</em></div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section id="editView" class="page-view hidden">
+          <div class="page-title">
+            <div>
+              <h1 id="editHeading">新增 BOM</h1>
+              <span>基础设置 &gt; 产品清单 &gt; BOM 清单 &gt; <b id="editCrumb">新增</b></span>
+            </div>
+            <div class="page-actions">
+              <button id="cancelEdit">取消</button>
+              <button id="saveDraft">保存草稿</button>
+              <button id="submitConfirm" class="primary">提交确认</button>
+            </div>
+          </div>
+
+          <section class="edit-panel">
+            <section class="info-block">
+              <h2>基础信息</h2>
+              <div class="form-grid">
+                <label><span><i>*</i>BOM 编号</span><input id="editCode" value="KC-BOM-STD-062" /></label>
+                <label><span><i>*</i>BOM 名称</span><input id="editName" placeholder="请输入 BOM 名称" /></label>
+                <label><span><i>*</i>适用品类</span><select id="editCategory"><option>墩身模板</option><option>承台模板</option><option>隧道台车</option><option>造楼机</option><option>液压系统</option></select></label>
+                <label><span><i>*</i>版本号</span><input id="editVersion" value="V1.0" /></label>
+                <label><span><i>*</i>维护仓库</span><select id="editWarehouse"><option>中心标准库</option><option>上海周转仓</option><option>苏州装备仓</option></select></label>
+                <label><span><i>*</i>维护人员</span><select id="editOwner"><option>张工</option><option>李工</option><option>周工</option><option>王工</option></select></label>
+                <label><span>版本状态</span><select id="editStatus"><option>草稿</option><option>待确认</option><option>已确认</option><option>已停用</option></select></label>
+                <label><span>来源方式</span><select id="editSource"><option>在线创建</option><option>Excel 导入</option><option>复制版本</option></select></label>
+              </div>
+            </section>
+
+            <section class="info-block">
+              <h2>BOM 层级清单</h2>
+              <div class="inline-toolbar">
+                <button id="addRoot" class="primary">新增一级</button>
+                <button id="editImport">导入 Excel</button>
+                <button id="deleteSelected">删除选中</button>
+              </div>
+              <div class="tree-table-wrap">
+                <table class="tree-table edit-tree-table">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" /></th>
+                      <th>层级</th>
+                      <th>名称</th>
+                      <th>规格</th>
+                      <th>数量</th>
+                      <th>单位</th>
+                      <th>单重</th>
+                      <th>总重</th>
+                      <th>备注</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="editTreeRows"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="info-block">
+              <h2>附件</h2>
+              <div class="upload-line">
+                <button>上传总装图 PDF</button>
+                <button>上传加工图 DWG</button>
+                <button>上传原始 Excel</button>
+              </div>
+            </section>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="mask" class="mask hidden"></div>
+
+    <section id="importModal" class="modal hidden">
+      <header><h2>BOM 导入 Excel</h2><button class="closeModal">×</button></header>
+      <div class="modal-body">
+        <div class="upload">
+          <strong>上传 BOM Excel</strong>
+          <p>字段包含层级、类型、名称、规格、数量、单位、单重、总重、备注。</p>
+          <button>选择文件</button>
+        </div>
+        <div class="modal-state">
+          <span>校验状态</span><strong>未开始</strong>
+        </div>
+      </div>
+      <footer><button class="closeModal">取消</button><button>下载模板</button><button class="primary">开始导入</button></footer>
+    </section>
+
+    <section id="copyModal" class="modal hidden">
+      <header><h2>复制生成新版本</h2><button class="closeModal">×</button></header>
+      <div class="modal-body">
+        <label>复制来源<input id="copySource" /></label>
+        <label>新版本号<input id="copyVersion" value="V2.0" /></label>
+        <label>维护仓库<select><option>中心标准库</option><option>上海周转仓</option><option>苏州装备仓</option></select></label>
+        <label>版本说明<textarea placeholder="请输入本次版本调整说明"></textarea></label>
+      </div>
+      <footer><button class="closeModal">取消</button><button class="primary">确认复制</button></footer>
+    </section>
+
+    <section id="addNodeModal" class="modal hidden">
+      <header><h2 id="addNodeTitle">新增节点</h2><button class="closeModal">×</button></header>
+      <div class="modal-body">
+        <label>新增类型<select id="nodeType"><option>创建分类组</option><option>选择产品清单已有产品</option><option>选择 BOM 清单已有 BOM</option></select></label>
+        <label>名称<input id="nodeName" value="标准面板" /></label>
+        <label>规格<input id="nodeSpec" value="1500*3000*6" /></label>
+        <label>数量<input id="nodeQty" value="12" /></label>
+        <label>单位<input id="nodeUnit" value="块" /></label>
+        <label>单重<input id="nodeUnitWeight" value="0.570 t" /></label>
+      </div>
+      <footer><button class="closeModal">取消</button><button class="primary" id="confirmAddNode">确认加入</button></footer>
+    </section>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

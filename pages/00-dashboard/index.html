@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 首页工作台</title>
+  <link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">科</span>
+        <strong>模架工装管理系统</strong>
+      </div>
+      <nav class="nav">
+        <span>首页</span>
+        <button class="active">首页工作台</button>
+        <span>基础数据</span>
+        <button>仓库设置</button>
+        <button>产品分类</button>
+        <button>产品管理/资产档案</button>
+        <button>BOM 清单</button>
+        <span>业务闭环</span>
+        <button>仓库管理</button>
+        <button>租赁订单管理</button>
+        <button>调拨订单管理</button>
+        <button>出库</button>
+        <button>入库</button>
+        <button>盘点</button>
+        <button>翻新</button>
+        <button>废旧处置</button>
+        <span>统计分析</span>
+        <button>库存/资产利用率分析</button>
+        <button>成本分析</button>
+      </nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">首页 / <strong>首页工作台</strong></div>
+        <div class="top-actions">
+          <span>当前公司：科创公司</span>
+          <button>反馈</button>
+          <button>通知<span class="dot">6</span></button>
+          <span class="avatar">领</span>
+          <select id="roleSelect" aria-label="切换角色">
+            <option>科创领导</option>
+            <option>仓库人员</option>
+            <option>商务人员</option>
+            <option>设计人员</option>
+          </select>
+        </div>
+      </header>
+
+      <section class="page-title">
+        <div>
+          <h1>首页工作台</h1>
+          <span>首页</span>
+        </div>
+        <div class="page-actions">
+          <button id="refreshBtn">刷新</button>
+          <button id="exportBtn">导出看板</button>
+          <button id="analysisBtn">进入统计分析</button>
+          <button id="ruleBtn">查看口径说明</button>
+        </div>
+      </section>
+
+      <form class="filter-panel">
+        <label>公司
+          <select id="companyFilter">
+            <option>科创公司</option>
+            <option>路桥公司</option>
+            <option>发展公司</option>
+            <option>一公司基础公司</option>
+            <option>三公司桥梁事业部</option>
+          </select>
+        </label>
+        <label>仓库
+          <select id="warehouseFilter">
+            <option>全部</option>
+            <option>上海物料站</option>
+            <option>苏州装备中心</option>
+            <option>华东项目虚拟仓</option>
+            <option>翻新待检仓</option>
+          </select>
+        </label>
+        <label>项目
+          <select id="projectFilter">
+            <option>全部</option>
+            <option>汉江桥梁 2 标</option>
+            <option>沪苏湖站房</option>
+            <option>科创中心备料</option>
+            <option>华东高架 3 标</option>
+          </select>
+        </label>
+        <label>时间范围
+          <input id="dateFilter" value="2026-05-01 至 2026-05-29">
+        </label>
+      </form>
+
+      <section class="metric-grid" id="metricGrid"></section>
+
+      <section class="dashboard-grid">
+        <article class="panel todo-panel">
+          <div class="panel-head">
+            <div>
+              <h2>待办列表</h2>
+              <span id="todoScope">科创领导重点</span>
+            </div>
+            <button id="emptyTodoBtn">空状态</button>
+          </div>
+          <div class="todo-list" id="todoList"></div>
+          <div class="state-box hidden" id="todoEmpty">
+            <strong>暂无待办事项</strong>
+            <span>当前范围内没有需要处理的审批或确认任务</span>
+          </div>
+        </article>
+
+        <article class="panel quick-panel">
+          <div class="panel-head">
+            <div>
+              <h2>快捷入口</h2>
+              <span>常用业务入口</span>
+            </div>
+          </div>
+          <div class="quick-grid" id="quickGrid"></div>
+        </article>
+
+        <article class="panel chart-panel large">
+          <div class="panel-head">
+            <div>
+              <h2>资产利用率趋势</h2>
+              <span>按月展示</span>
+            </div>
+            <button id="loadingBtn">加载状态</button>
+          </div>
+          <div class="line-chart" id="lineChart"></div>
+          <div class="state-box overlay hidden" id="loadingState">
+            <strong>数据加载中</strong>
+            <span>正在刷新当前范围指标</span>
+          </div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h2>库存状态结构</h2>
+              <span>当前库存状态占比</span>
+            </div>
+          </div>
+          <div class="bar-list" id="stockBars"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h2>分类利用率排行</h2>
+              <span>Top 5</span>
+            </div>
+          </div>
+          <div class="rank-list" id="rankList"></div>
+        </article>
+
+        <article class="panel exception-panel large">
+          <div class="panel-head">
+            <div>
+              <h2>异常提醒</h2>
+              <span>超期、缺口、同步与成本异常</span>
+            </div>
+            <button id="permissionBtn">无权限状态</button>
+          </div>
+          <table class="mini-table">
+            <thead>
+              <tr><th>异常类型</th><th>对象</th><th>影响范围</th><th>状态</th><th>操作</th></tr>
+            </thead>
+            <tbody id="exceptionRows"></tbody>
+          </table>
+          <div class="state-box hidden" id="permissionState">
+            <strong>暂无查看权限</strong>
+            <span>请联系管理员开通当前范围的异常明细权限</span>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <section class="modal hidden" id="ruleModal">
+    <header><h2>口径说明</h2><button id="closeRule">×</button></header>
+    <div class="modal-body">
+      <dl class="info-grid">
+        <div><dt>库存总量</dt><dd>可用、在租、待检、翻新中、在途和报废待处置数量合计。</dd></div>
+        <div><dt>资产利用率</dt><dd>在租资产数量 / 可租资产数量。</dd></div>
+        <div><dt>当月出入库</dt><dd>按当前时间范围内已确认单据汇总。</dd></div>
+        <div><dt>成本口径</dt><dd>已录入成本、人工指定成本和待补充成本分别标记。</dd></div>
+      </dl>
+    </div>
+    <footer><button id="confirmRule" class="primary">知道了</button></footer>
+  </section>
+  <div class="mask hidden" id="mask"></div>
+
+  <script src="./dashboard.js"></script>
+</body>
+</html>

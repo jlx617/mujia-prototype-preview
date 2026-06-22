@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 内部结算管理</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">科</span><strong>模架工装管理系统</strong></div>
+      <div class="top-tools">
+        <button>意见反馈</button><button>主题</button><button class="notice">通知</button>
+        <span class="avatar">财</span><span>财务人员</span><span>⌄</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="collapse">☰</button>
+      <nav>
+        <div class="menu-group"><button class="menu-parent">▦ 基础设置 <i>›</i></button></div>
+        <div class="menu-group"><button class="menu-parent">▤ 订单管理 <i>›</i></button></div>
+        <div class="menu-group"><button class="menu-parent">▥ 仓库业务 <i>›</i></button></div>
+        <div class="menu-group open">
+          <button class="menu-parent">▧ 结算管理 <i>⌄</i></button>
+          <button class="submenu">外部结算管理</button>
+          <button class="submenu active">内部结算管理</button>
+        </div>
+        <div class="menu-group"><button class="menu-parent">□ 统计分析 <i>›</i></button></div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section id="listView" class="view">
+        <div class="page-title">
+          <div><h1>内部结算管理</h1><span>结算管理 &gt; <b>内部结算管理</b></span></div>
+        </div>
+        <form class="filters" id="filterForm">
+          <label><span>供应商名称</span><input id="supplierFilter" placeholder="请输入供应商名称"></label>
+          <label><span>资料编号</span><input id="codeFilter" placeholder="请输入结算资料编号"></label>
+          <label><span>关联业务</span><select id="businessFilter"><option value="">全部</option><option>采购</option><option>翻新</option><option>改制</option><option>其他</option></select></label>
+          <label><span>资料状态</span><select id="statusFilter"><option value="">全部</option><option>待提交</option><option>待确认</option><option>已归档</option></select></label>
+          <label class="date-range"><span>时间范围</span><div><input id="startDate" type="date"><em>至</em><input id="endDate" type="date"></div></label>
+          <div class="filter-actions"><button type="submit" class="primary">查询</button><button type="button" id="resetBtn">重置</button></div>
+        </form>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <strong>供应商结算资料台账</strong>
+            <div><button id="uploadBtn">上传附件</button><button id="exportBtn">导出</button><button id="createBtn" class="primary">新增结算资料</button></div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>资料编号</th><th>供应商</th><th>关联业务</th><th>关联单据</th><th class="money">结算金额（元）</th><th>资料状态</th><th>确认方式</th><th>附件数量</th><th>最近更新</th><th>操作</th></tr></thead>
+              <tbody id="recordRows"></tbody>
+            </table>
+            <div id="emptyState" class="empty hidden"><strong>暂无符合条件的结算资料</strong><span>请调整筛选条件后重新查询</span></div>
+          </div>
+          <div class="pagination">
+            <span class="page-total">共50条</span><button disabled>上一页</button><button class="active">1</button><button>2</button><button>3</button><span>...</span><button>5</button><button>下一页</button>
+            <select><option>10条/页</option><option>20条/页</option><option>50条/页</option></select><span>跳至</span><input value="1"><span>页</span>
+          </div>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div><h1>结算资料详情</h1><span>结算管理 &gt; 内部结算管理 &gt; <b>查看详情</b></span></div>
+          <div class="page-actions"><button data-back>← 返回</button><button id="detailEditBtn" class="primary">编辑</button></div>
+        </div>
+        <div class="detail-body">
+          <section class="block"><h2>供应商信息</h2><dl class="info-grid" id="supplierInfo"></dl></section>
+          <section class="block"><h2>结算资料</h2><dl class="info-grid" id="settlementInfo"></dl></section>
+          <section class="block">
+            <h2>附件</h2>
+            <div class="files" id="fileList"></div>
+          </section>
+          <section class="block">
+            <h2>关联采购 / 翻新 / 改制记录</h2>
+            <div class="mini-table"><table><thead><tr><th>业务类型</th><th>关联单据</th><th>业务内容</th><th>发生日期</th><th class="money">关联金额（元）</th><th>状态</th></tr></thead><tbody id="businessRows"></tbody></table></div>
+          </section>
+          <section class="block"><h2>确认记录</h2><ol class="timeline" id="confirmList"></ol></section>
+        </div>
+      </section>
+
+      <section id="editView" class="view">
+        <div class="page-title">
+          <div><h1 id="editHeading">新增结算资料</h1><span>结算管理 &gt; 内部结算管理 &gt; <b id="editCrumb">新增</b></span></div>
+          <div class="page-actions"><button data-back>取消</button><button id="saveBtn">保存</button><button id="submitBtn" class="primary">提交确认</button></div>
+        </div>
+        <form class="edit-body" id="editForm">
+          <section class="block">
+            <h2>供应商信息</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span>供应商名称</span><input id="editSupplier" required></label>
+              <label class="form-item required"><span>统一社会信用代码</span><input id="editCreditCode" required></label>
+              <label class="form-item"><span>联系人</span><input id="editContact"></label>
+              <label class="form-item"><span>联系电话</span><input id="editPhone"></label>
+              <label class="form-item"><span>开户银行</span><input id="editBank"></label>
+              <label class="form-item"><span>银行账号</span><input id="editAccount"></label>
+            </div>
+          </section>
+          <section class="block">
+            <h2>结算资料</h2>
+            <div class="form-grid">
+              <label class="form-item"><span>资料编号</span><input value="系统自动生成" disabled></label>
+              <label class="form-item required"><span>关联业务</span><select id="editBusiness" required><option>采购</option><option>翻新</option><option>改制</option><option>其他</option></select></label>
+              <label class="form-item required"><span>关联单据</span><input id="editDocument" required placeholder="请输入或选择关联单据"></label>
+              <label class="form-item required"><span>结算金额</span><div class="unit-input"><span>¥</span><input id="editAmount" required></div></label>
+              <label class="form-item required"><span>结算期间</span><div class="range-control"><input id="editStart" type="date" required><em>至</em><input id="editEnd" type="date" required></div></label>
+              <label class="form-item"><span>确认方式</span><select id="editApproval"><option>线上确认</option><option>线下确认</option></select></label>
+              <label class="form-item full"><span>结算说明</span><textarea id="editRemark" placeholder="请输入结算范围、差异或补充说明"></textarea></label>
+            </div>
+          </section>
+          <section class="block">
+            <h2>附件资料</h2>
+            <div class="upload-panel" id="uploadPanel"><strong>＋ 点击上传供应商结算资料</strong><span>支持结算单、发票、合同、对账单及其他供应商模板文件，单个文件不超过 20MB</span><div id="uploadedFiles">供应商结算单.pdf　采购对账明细.xlsx</div></div>
+          </section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="uploadModal">
+    <div class="modal-card"><header><h2>上传附件</h2><button data-close>×</button></header><div class="modal-content"><label><span>关联结算资料</span><select><option>JSZL-202606-001</option><option>JSZL-202606-002</option><option>JSZL-202606-003</option></select></label><div class="modal-upload">＋ 选择文件或拖拽到此处</div></div><footer><button data-close>取消</button><button class="primary" id="confirmUpload">确定上传</button></footer></div>
+  </div>
+  <div class="modal hidden" id="archiveModal">
+    <div class="modal-card compact"><header><h2>归档确认</h2><button data-close>×</button></header><div class="confirm-message"><span>!</span><p>确认将该结算资料归档？归档后资料仅支持查看和导出。</p></div><footer><button data-close>取消</button><button class="primary" id="confirmArchive">确定归档</button></footer></div>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+  <script src="./script.js"></script>
+</body>
+</html>

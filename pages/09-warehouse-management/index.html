@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 仓库管理</title>
+  <link rel="stylesheet" href="../../shared/warehouse-management.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <div class="brand"><b>科</b><span>模架工装管理系统</span></div>
+      <nav>
+        <p>基础数据</p>
+        <button>仓库设置</button><button>产品分类</button><button>产品清单</button><button>BOM 清单</button>
+        <p>业务闭环</p>
+        <button class="on">仓库管理</button><button>租赁订单管理</button><button>调拨订单管理</button><button>出库</button><button>入库</button><button>盘点</button><button>翻新维保</button><button>废旧处置</button>
+        <p>统计分析</p>
+        <button>库存分析</button><button>成本分析</button>
+      </nav>
+    </aside>
+    <main>
+      <header class="top">
+        <div class="crumb">首页 / 仓库业务 / <strong>仓库管理</strong></div>
+        <div class="tools"><span>当前公司：科创公司</span><button>反馈</button><button>通知<i>4</i></button><em>仓</em><span>仓库业务操作角色</span></div>
+      </header>
+
+      <section class="page-view active" id="listView">
+        <section class="titlebar">
+          <div><h1>仓库管理</h1><p>仓库业务 &gt; 仓库管理</p></div>
+        </section>
+
+        <form class="filters">
+          <label>仓库<select id="warehouse"><option>全部</option><option>上海物料站</option><option>苏州装备中心</option><option>华东项目仓库</option></select></label>
+          <label>库区<select id="area"><option>全部</option><option>A 储存区</option><option>B 待检区</option><option>C 翻新区</option><option>D 废品区</option></select></label>
+          <label>分类<select id="category"><option>全部</option><option>模架体系</option><option>集成工装</option><option>低值辅材</option></select></label>
+          <label>规格<input id="spec" placeholder="规格型号/物资名称"></label>
+          <label>状态<select id="state"><option>全部</option><option>可用</option><option>在租</option><option>待检</option><option>翻新中</option><option>在途</option><option>报废</option><option>一次性</option></select></label>
+          <label>项目<select id="project"><option>全部</option><option>汉江桥梁 2 标</option><option>沪苏湖站房</option><option>科创中心备料</option></select></label>
+          <label>是否一物一码<select id="unique"><option>全部</option><option>是</option><option>否</option></select></label>
+          <label>批次<input id="batch" placeholder="批次号/资产编码"></label>
+          <div class="filter-actions"><button type="button" class="primary" id="query">查询</button><button type="button" id="reset">重置</button></div>
+        </form>
+
+        <section class="table-card">
+          <div class="table-head">
+            <div><b>库存表格</b><span id="scopeText">当前：全部仓库</span></div>
+            <div><button id="flowEntry">库存流水</button><button id="exportLedger">导出库存台账</button><button id="stocktake">发起盘点</button><button class="primary" id="outbound">发起出库</button></div>
+          </div>
+          <div id="error" class="error hidden">库存服务异常，请稍后重试或联系管理员。</div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th><input type="checkbox"></th><th>物资名称</th><th>规格型号</th><th>库存状态</th><th>所在仓库/项目</th><th>库区库位</th><th data-sort="available">可用数量</th><th data-sort="rented">在租数量</th><th data-sort="inspect">待检数量</th><th data-sort="refurbish">翻新中数量</th><th>批次/编码</th><th>确认状态</th><th>成本状态</th><th data-sort="time">最近出入库时间</th><th>操作</th></tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty" class="empty hidden"><div>∅</div><strong>暂无符合条件的库存记录</strong><p>请调整筛选条件后重新查询。</p></div>
+          <footer class="pager"><span id="summary">共0条</span><button>‹</button><button class="current">1</button><button>2</button><button>›</button><select><option>20条/页</option><option>50条/页</option></select><span>跳至</span><input value="1"><span>页</span></footer>
+        </section>
+      </section>
+
+      <section class="page-view" id="detailView">
+        <section class="titlebar">
+          <div><h1 id="detailTitle">库存详情</h1><p>仓库业务 &gt; 仓库管理 &gt; 查看详情</p></div>
+          <div class="title-actions"><button id="detailBack">← 返回</button><button id="detailOutbound" class="primary">发起出库</button></div>
+        </section>
+        <section class="detail-layout">
+          <div class="detail-main">
+            <section class="info-block">
+              <h2>基础信息</h2>
+              <div class="detail-grid" id="detailGrid"></div>
+            </section>
+            <section class="info-block">
+              <h2>库存总览</h2>
+              <div class="overview compact" id="detailOverview"></div>
+            </section>
+            <section class="info-block">
+              <h2>状态分布</h2>
+              <div class="bars" id="detailBars"></div>
+            </section>
+            <section class="info-block">
+              <h2>库区/库位视图</h2>
+              <div class="location-detail" id="locationDetail"></div>
+            </section>
+            <section class="info-block">
+              <h2>生命周期</h2>
+              <ol class="timeline" id="timeline"></ol>
+            </section>
+            <section class="info-block">
+              <h2>库存流水</h2>
+              <table class="detail-table">
+                <thead><tr><th>流水单号</th><th>业务类型</th><th>来源单据</th><th>数量</th><th>操作人</th><th>确认状态</th><th>发生时间</th></tr></thead>
+                <tbody id="flowRows"></tbody>
+              </table>
+            </section>
+          </div>
+          <aside class="anchor-nav"><a class="active">基础信息</a><a>库存总览</a><a>库区库位</a><a>生命周期</a><a>库存流水</a></aside>
+        </section>
+      </section>
+
+      <section class="page-view" id="editView">
+        <section class="titlebar">
+          <div><h1 id="editTitle">发起出库</h1><p id="editCrumb">仓库业务 &gt; 仓库管理 &gt; 办理</p></div>
+          <div class="title-actions"><button id="editCancel">取消</button><button id="editSave">保存</button><button class="primary" id="editSubmit">提交</button></div>
+        </section>
+        <section class="edit-main">
+          <section class="info-block">
+            <h2>办理信息</h2>
+            <div class="form-grid" id="editForm"></div>
+          </section>
+          <section class="info-block">
+            <h2>物资明细</h2>
+            <table class="detail-table">
+              <thead><tr><th>物资名称</th><th>规格型号</th><th>仓库/项目</th><th>库区库位</th><th>批次/编码</th><th>数量</th><th>确认状态</th></tr></thead>
+              <tbody id="editRows"></tbody>
+            </table>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="mask" class="mask hidden"></div>
+  <section id="modal" class="modal hidden">
+    <header><h2 id="modalTitle">导出库存台账</h2><button id="closeModal">×</button></header>
+    <div class="modal-body" id="modalBody"></div>
+    <footer><button id="cancelModal">取消</button><button class="primary" id="confirmModal">确定</button></footer>
+  </section>
+
+  <script src="../../shared/warehouse-management.js"></script>
+</body>
+</html>

@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 成本信息管理</title>
+  <style>
+    :root {
+      --color-primary: #2eb3ff;
+      --color-primary-hover: #53c6ff;
+      --color-primary-active: #1c8ad2;
+      --color-primary-light: #e8faff;
+      --color-success: #00cf61;
+      --color-warning: #ffb82e;
+      --color-danger: #ff3b3b;
+      --color-emphasis: #ff7723;
+      --text-primary: #212529;
+      --text-secondary: #8d97ad;
+      --text-tertiary: #b7c4cc;
+      --border-color: #dee1e3;
+      --divider-color: #e9eff4;
+      --page-bg: #edf1f5;
+      --content-bg: #ffffff;
+      --font-family: "Microsoft YaHei", Arial, "PingFang SC", Helvetica, sans-serif;
+      --font-size-base: 14px;
+      --font-size-small: 12px;
+      --radius-base: 3px;
+      --radius-container: 4px;
+      --control-height: 32px;
+      --table-row-height: 40px;
+      --sidebar-width: 128px;
+      --topbar-height: 36px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text-primary);
+      font: var(--font-size-base)/22px var(--font-family);
+    }
+    button, input, select, textarea { font: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    button {
+      height: var(--control-height);
+      padding: 0 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-base);
+      background: #fff;
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    button:disabled {
+      border-color: var(--border-color);
+      background: #f5f7fa;
+      color: var(--text-tertiary);
+      cursor: not-allowed;
+    }
+    .primary { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+    .primary:hover { border-color: var(--color-primary-hover); background: var(--color-primary-hover); color: #fff; }
+    input, select, textarea {
+      width: 100%;
+      height: var(--control-height);
+      padding: 0 8px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-base);
+      background: #fff;
+      color: var(--text-primary);
+      outline: none;
+    }
+    textarea { height: 72px; padding: 6px 8px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--color-primary); }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      flex: 0 0 var(--sidebar-width);
+      border-right: 1px solid var(--divider-color);
+      background: #fff;
+    }
+    .brand {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-top: 3px solid #243f52;
+      border-bottom: 1px solid var(--divider-color);
+    }
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-base);
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: 700;
+    }
+    .brand strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav { padding: 10px 8px; }
+    .nav span {
+      display: block;
+      margin: 14px 8px 6px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+    .nav button {
+      width: 100%;
+      height: 36px;
+      margin-bottom: 4px;
+      padding: 0 8px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+    }
+    .nav button.active, .nav button:hover { background: var(--color-primary-light); color: var(--color-primary); }
+    .workspace { flex: 1; min-width: 1180px; }
+    .topbar {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-top: 3px solid #243f52;
+      border-bottom: 1px solid var(--divider-color);
+      background: #fff;
+    }
+    .breadcrumb, .top-actions { color: var(--text-secondary); font-size: 12px; }
+    .breadcrumb strong { color: var(--color-primary); }
+    .top-actions, .page-actions, .toolbar-actions, .filter-actions, .pagination, .row-actions, .inline-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top-actions select { width: 150px; height: 28px; font-size: 12px; }
+    .top-actions button { height: 28px; padding: 0 8px; }
+    .dot {
+      min-width: 16px;
+      height: 16px;
+      display: inline-grid;
+      place-items: center;
+      margin-left: 4px;
+      border-radius: 8px;
+      background: var(--color-danger);
+      color: #fff;
+      font-size: 12px;
+    }
+    .avatar {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      color: #fff;
+    }
+    .view { display: none; padding: 0 12px 12px; }
+    .view.is-active { display: block; }
+    .page-title {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    .page-title h1 { display: inline-block; margin-right: 12px; font-size: 16px; line-height: 24px; }
+    .page-title span { color: var(--text-secondary); font-size: 12px; }
+    .filter-panel, .table-shell, .content-panel, .edit-panel {
+      border: 1px solid var(--divider-color);
+      border-radius: var(--radius-container);
+      background: #fff;
+    }
+    .filter-panel {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 12px 16px;
+      margin-bottom: 8px;
+      padding: 16px;
+    }
+    .filter-item {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    .filter-actions { grid-column: 1 / -1; justify-content: flex-end; }
+    .table-shell {
+      overflow: hidden;
+      padding: 0 16px 8px;
+    }
+    .table-toolbar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--divider-color);
+    }
+    .toolbar-title { font-weight: 600; }
+    .toolbar-actions button { height: 30px; }
+    .table-scroll { width: 100%; overflow-x: auto; }
+    .data-table, .detail-table {
+      width: 100%;
+      min-width: 1250px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    th, td {
+      height: var(--table-row-height);
+      padding: 0 8px;
+      border-bottom: 1px solid var(--divider-color);
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    th { background: #f3f6f9; font-weight: 600; }
+    tbody tr:hover td { background: #fbfdff; }
+    .data-table th:first-child, .data-table td:first-child { width: 38px; text-align: center; }
+    .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 120px; }
+    .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 94px; }
+    .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 130px; }
+    .data-table th:nth-child(8), .data-table td:nth-child(8) { width: 104px; }
+    .data-table th:nth-child(9), .data-table td:nth-child(9) { width: 112px; }
+    .data-table th:nth-child(12), .data-table td:nth-child(12) { width: 106px; }
+    .row-actions button, .link-btn {
+      height: 24px;
+      padding: 0 4px;
+      border: 0;
+      background: transparent;
+      color: var(--color-primary);
+    }
+    .expand-toggle {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      margin-right: 2px;
+      border: 0;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .expanded-row td {
+      height: auto;
+      padding: 8px 10px;
+      background: #fbfdff;
+    }
+    .mini-detail {
+      display: flex;
+      gap: 16px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      white-space: normal;
+    }
+    .mini-detail strong { color: var(--text-primary); font-weight: 400; }
+    .tag {
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: var(--radius-base);
+      font-size: 12px;
+    }
+    .tag-blue { background: #e8faff; color: #1c8ad2; }
+    .tag-green { background: #e8ffef; color: #128846; }
+    .tag-orange { background: #fff5e8; color: #c45a12; }
+    .tag-yellow { background: #fffbe8; color: #a86d00; }
+    .tag-red { background: #ffece8; color: #d92d20; }
+    .tag-gray { background: #f5f7fa; color: var(--text-secondary); }
+    .pagination {
+      justify-content: flex-end;
+      min-height: 40px;
+      padding-top: 8px;
+      border-top: 1px solid var(--divider-color);
+      color: var(--text-primary);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .page-total { margin-right: 8px; color: var(--text-secondary); }
+    .page-btn {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-base);
+      background: #fff;
+      color: var(--text-primary);
+    }
+    .page-btn.active { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+    .page-btn.disabled { background: #f5f7fa; color: var(--text-tertiary); cursor: not-allowed; }
+    .page-size { width: 82px; height: 28px; margin-left: 8px; padding: 0 4px; }
+    .page-jump { width: 52px; height: 28px; }
+    .empty-state {
+      display: grid;
+      place-items: center;
+      gap: 6px;
+      min-height: 168px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .empty-state strong { color: var(--text-primary); }
+    .hidden { display: none !important; }
+    .content-panel, .edit-panel { margin-bottom: 8px; padding: 16px; }
+    .content-panel h2, .form-block h2 {
+      position: relative;
+      margin-bottom: 14px;
+      padding-left: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .content-panel h2::before, .form-block h2::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 3px;
+      height: 14px;
+      background: var(--color-primary);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px 40px;
+      margin: 0;
+    }
+    .info-grid div { display: grid; grid-template-columns: 92px minmax(0, 1fr); column-gap: 8px; min-height: 26px; }
+    .info-grid dt { color: var(--text-secondary); text-align: right; }
+    .info-grid dd { margin: 0; color: var(--text-primary); min-width: 0; overflow-wrap: anywhere; }
+    .info-grid .wide { grid-column: span 2; }
+    .form-block {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--divider-color);
+    }
+    .form-block:first-child { padding-top: 0; }
+    .form-block:last-child { padding-bottom: 0; border-bottom: 0; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px 40px;
+    }
+    .form-item {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 8px;
+    }
+    .form-label {
+      position: relative;
+      justify-self: end;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 20px;
+      text-align: right;
+    }
+    .form-item.required .form-label::before {
+      content: "*";
+      margin-right: 4px;
+      color: var(--color-danger);
+    }
+    .form-item.full { grid-column: 1 / -1; }
+    .form-item.wide { grid-column: span 2; }
+    .amount-field { position: relative; }
+    .amount-field span {
+      position: absolute;
+      right: 8px;
+      top: 5px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+    .amount-field input { padding-right: 28px; }
+    .upload-panel {
+      min-height: 110px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--border-color);
+      background: #f7fafc;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .timeline {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) 150px;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--divider-color);
+      border-radius: var(--radius-container);
+      background: #fbfdff;
+    }
+    .timeline span { color: var(--text-secondary); font-size: 12px; }
+    .dialog-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(36, 63, 82, 0.72);
+      z-index: 20;
+    }
+    .dialog-mask.is-open { display: flex; }
+    .dialog {
+      width: 600px;
+      border-radius: var(--radius-container);
+      background: #fff;
+      box-shadow: 0 16px 42px rgba(36, 63, 82, 0.25);
+    }
+    .dialog-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--divider-color);
+    }
+    .dialog-header h3 { font-size: 18px; font-weight: 600; }
+    .dialog-body { padding: 20px; }
+    .dialog-footer {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 20px 20px;
+    }
+    .upload-box {
+      height: 136px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--border-color);
+      background: #f7fafc;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .cost-choice-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 16px;
+      margin-bottom: 12px;
+      padding: 12px;
+      border: 1px solid var(--divider-color);
+      border-radius: var(--radius-container);
+      background: #fbfdff;
+    }
+    .cost-choice-summary span { color: var(--text-secondary); font-size: 12px; }
+    .cost-choice-summary strong { display: block; margin-top: 2px; font-weight: 600; color: var(--text-primary); }
+    .cost-choice-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .cost-choice-table th,
+    .cost-choice-table td {
+      height: 36px;
+      padding: 0 8px;
+      border-bottom: 1px solid var(--divider-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cost-choice-table th:first-child,
+    .cost-choice-table td:first-child { width: 44px; text-align: center; }
+    .cost-choice-table th:nth-child(2),
+    .cost-choice-table td:nth-child(2) { width: 118px; }
+    .cost-choice-table th:nth-child(4),
+    .cost-choice-table td:nth-child(4) { width: 170px; }
+    .cost-choice-table th:nth-child(5),
+    .cost-choice-table td:nth-child(5) { width: 88px; }
+    .cost-dialog .dialog { width: 860px; }
+    @media (max-width: 1500px) {
+      .filter-panel { grid-template-columns: repeat(3, minmax(170px, 1fr)); }
+      .workspace { min-width: 1080px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">科</span>
+        <strong>模架工装管理系统</strong>
+      </div>
+      <nav class="nav">
+        <span>首页</span>
+        <button>首页工作台</button>
+        <span>基础设置</span>
+        <button>仓库设置</button>
+        <button>产品分类</button>
+        <button>产品清单</button>
+        <button class="active">成本信息管理</button>
+        <button>BOM 清单</button>
+        <button>租赁规则设置</button>
+        <span>业务闭环</span>
+        <button>仓库管理</button>
+        <button>租赁订单管理</button>
+        <button>调拨订单管理</button>
+        <button>采购订单管理</button>
+        <button>出库</button>
+        <button>入库</button>
+        <span>统计分析</span>
+        <button>成本分析</button>
+      </nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">首页 / 基础设置 / 产品管理 / <strong>成本信息管理</strong></div>
+        <div class="top-actions">
+          <span id="warehouseSwitcherWrap">当前仓库</span>
+          <select id="topWarehouse">
+            <option>上海物料站</option>
+            <option>苏州装备中心</option>
+            <option>华东项目仓</option>
+          </select>
+          <span>权限视角</span>
+          <select id="roleSwitch">
+            <option value="warehouse">仓库业务操作角色</option>
+            <option value="project">项目业务操作角色</option>
+            <option value="master">中心主数据管理员</option>
+            <option value="readonly">公司组织查看角色</option>
+          </select>
+          <button>反馈</button>
+          <button>通知<span class="dot">3</span></button>
+          <span class="avatar">成</span>
+          <span id="userName">仓库业务操作角色</span>
+        </div>
+      </header>
+
+      <section id="listView" class="view is-active">
+        <div class="page-title">
+          <div>
+            <h1>成本信息管理</h1>
+            <span>基础设置 / 产品管理 / 成本信息管理</span>
+          </div>
+        </div>
+
+        <form class="filter-panel" id="filterForm">
+          <label class="filter-item"><span>产品名称/编码</span><input id="productFilter" placeholder="请输入产品名称或编码"></label>
+          <label class="filter-item"><span>管理维度</span><select id="dimensionFilter"><option>全部</option><option>数量</option><option>批次</option><option>序列号</option></select></label>
+          <label class="filter-item"><span>成本来源</span><select id="sourceFilter"><option>全部</option><option>采购入库</option><option>新生产入库</option><option>退租入库</option><option>人工录入</option><option>调整</option></select></label>
+          <label class="filter-item"><span>批次号/资产码</span><input id="batchFilter" placeholder="请输入批次号或资产码"></label>
+          <label class="filter-item"><span>成本状态</span><select id="statusFilter"><option>全部</option><option>有效</option><option>已调整</option><option>停用</option></select></label>
+          <div class="filter-actions">
+            <button type="button" class="primary" id="queryBtn">查询</button>
+            <button type="button" id="resetBtn">重置</button>
+          </div>
+        </form>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <div class="toolbar-title">产品成本价格列表</div>
+            <div class="toolbar-actions">
+              <button id="adjustTraceBtn">调整留痕</button>
+              <button id="exportBtn">导出</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="全选"></th>
+                  <th>产品编码</th>
+                  <th>产品名称</th>
+                  <th>规格型号</th>
+                  <th>管理维度</th>
+                  <th>单位</th>
+                  <th>可选成本价</th>
+                  <th>当前成本价</th>
+                  <th>成本来源</th>
+                  <th>批次/资产数</th>
+                  <th>状态</th>
+                  <th>更新时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="costRows"></tbody>
+            </table>
+          </div>
+          <div class="empty-state hidden" id="emptyState">
+            <strong>暂无符合条件的产品</strong>
+            <span>请调整筛选条件后重新查询</span>
+          </div>
+          <div class="empty-state hidden" id="permissionState">
+            <strong>无成本信息页面权限</strong>
+            <span>当前账号不能查看成本信息管理页面</span>
+          </div>
+          <footer class="pagination">
+            <span class="page-total" id="summaryText">共50条</span>
+            <button class="page-btn disabled" aria-label="上一页">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-ellipsis">...</span>
+            <button class="page-btn">5</button>
+            <button class="page-btn" aria-label="下一页">›</button>
+            <select class="page-size" aria-label="每页条数"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <span>跳至</span>
+            <input class="page-jump" value="1" aria-label="跳转页码">
+            <span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div>
+            <h1>产品成本详情</h1>
+            <span>基础设置 / 产品管理 / 成本信息管理 / 查看详情</span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">返回</button>
+            <button id="detailTraceBtn">调整留痕</button>
+            <button class="primary" id="detailAdjustBtn">成本价格</button>
+          </div>
+        </div>
+        <article class="content-panel">
+          <h2>产品信息</h2>
+          <dl class="info-grid" id="detailBase"></dl>
+        </article>
+        <article class="content-panel">
+          <h2>当前成本价格</h2>
+          <dl class="info-grid" id="detailSource"></dl>
+        </article>
+        <article class="content-panel">
+          <h2>批次/数量/单件成本明细</h2>
+          <table class="detail-table">
+            <thead><tr><th>成本价格</th><th>归纳对象</th><th>批次/资产码</th><th>可用数量</th><th>成本来源</th><th>关联入库单</th><th>更新时间</th></tr></thead>
+            <tbody id="inboundRows"></tbody>
+          </table>
+        </article>
+        <article class="content-panel">
+          <h2>调整记录</h2>
+          <ol class="timeline" id="adjustRows"></ol>
+        </article>
+        <article class="content-panel">
+          <h2>关联订单</h2>
+          <table class="detail-table">
+            <thead><tr><th>订单编号</th><th>订单类型</th><th>项目</th><th>使用数量</th><th>成本金额</th><th>订单状态</th></tr></thead>
+            <tbody id="orderRows"></tbody>
+          </table>
+        </article>
+      </section>
+
+      <section id="editView" class="view">
+        <div class="page-title">
+          <div>
+            <h1 id="editHeading">成本价格维护</h1>
+            <span>基础设置 / 产品管理 / 成本信息管理 / <b id="editCrumb">修改</b></span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">取消</button>
+            <button id="saveBtn">保存</button>
+            <button class="primary" id="submitBtn">提交</button>
+          </div>
+        </div>
+        <form class="edit-panel">
+          <section class="form-block">
+            <h2>成本信息</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span class="form-label">产品</span><select id="editProduct"><option>KC-BLP-321 贝雷片</option><option>KC-GMB-1500 钢模板</option><option>KC-ZC-609 钢支撑</option></select></label>
+              <label class="form-item required"><span class="form-label">批次/资产码</span><input id="editBatch" value="KC-BLP-2026-05-A"></label>
+              <label class="form-item required"><span class="form-label">管理维度</span><select id="editDimension"><option>批次</option><option>数量</option><option>序列号</option></select></label>
+              <label class="form-item required"><span class="form-label">数量</span><input id="editQty" value="360"></label>
+              <label class="form-item required"><span class="form-label">单位成本</span><span class="amount-field"><input id="editUnit" value="418.00"><span>元</span></span></label>
+              <label class="form-item required"><span class="form-label">总成本</span><span class="amount-field"><input id="editTotal" value="150480.00"><span>元</span></span></label>
+              <label class="form-item required"><span class="form-label">来源</span><select id="editSource"><option>采购入库</option><option>新生产入库</option><option>人工录入</option><option>调整</option></select></label>
+              <label class="form-item"><span class="form-label">关联入库单</span><input id="editInbound" value="RK-20260529-001"></label>
+              <label class="form-item"><span class="form-label">审批状态</span><select id="editApproval"><option>待提交</option><option>审批中</option><option>已通过</option></select></label>
+            </div>
+          </section>
+          <section class="form-block">
+            <h2>调整信息</h2>
+            <div class="form-grid">
+              <label class="form-item"><span class="form-label">调整前成本</span><span class="amount-field"><input id="beforeCost" value="150480.00"><span>元</span></span></label>
+              <label class="form-item"><span class="form-label">调整后成本</span><span class="amount-field"><input id="afterCost" value="152640.00"><span>元</span></span></label>
+              <label class="form-item"><span class="form-label">调整人</span><input id="adjustUser" value="李敏"></label>
+              <label class="form-item full"><span class="form-label">调整原因</span><textarea id="adjustReason">补录采购发票差额，按确认后的入库验收数量重新分摊。</textarea></label>
+            </div>
+          </section>
+          <section class="form-block">
+            <h2>附件</h2>
+            <label class="form-item full">
+              <span class="form-label">附件上传</span>
+              <div class="upload-panel">
+                <div>
+                  <strong>点击或拖拽上传附件</strong>
+                  <p>采购发票.pdf、入库验收单.pdf</p>
+                </div>
+              </div>
+            </label>
+          </section>
+        </form>
+      </section>
+
+      <section id="traceView" class="view">
+        <div class="page-title">
+          <div>
+            <h1>成本调整留痕</h1>
+            <span>基础设置 / 产品管理 / 成本信息管理 / 调整留痕</span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">返回</button>
+            <button id="traceExportBtn">导出</button>
+          </div>
+        </div>
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <div class="toolbar-title">调整记录</div>
+            <div class="inline-tools">
+              <select id="traceStatus"><option>全部状态</option><option>审批中</option><option>已通过</option><option>驳回</option></select>
+              <button id="traceQueryBtn">查询</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="detail-table">
+              <thead><tr><th>调整单号</th><th>产品</th><th>批次/资产码</th><th>调整前金额</th><th>调整后金额</th><th>调整人</th><th>调整原因</th><th>审批状态</th><th>调整时间</th></tr></thead>
+              <tbody id="traceRows"></tbody>
+            </table>
+          </div>
+          <footer class="pagination">
+            <span class="page-total">共50条</span>
+            <button class="page-btn disabled" aria-label="上一页">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn" aria-label="下一页">›</button>
+            <select class="page-size"><option>10条/页</option><option>20条/页</option></select>
+            <span>跳至</span>
+            <input class="page-jump" value="1">
+            <span>页</span>
+          </footer>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="dialog-mask cost-dialog" id="costDialog">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="costDialogTitle">
+      <div class="dialog-header">
+        <h3 id="costDialogTitle">选择成本价格</h3>
+        <button id="closeCostBtn" aria-label="关闭">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="cost-choice-summary" id="costChoiceSummary"></div>
+        <table class="cost-choice-table">
+          <thead>
+            <tr>
+              <th>选择</th>
+              <th>成本价格</th>
+              <th>归纳对象</th>
+              <th>批次/数量/单件范围</th>
+              <th>可用数量</th>
+              <th>成本来源</th>
+              <th>更新时间</th>
+            </tr>
+          </thead>
+          <tbody id="costChoiceRows"></tbody>
+        </table>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancelCostBtn">取消</button>
+        <button class="primary" id="confirmCostBtn">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      {
+        code: "KC-BLP-321",
+        name: "贝雷片",
+        spec: "321 型 3m Q345",
+        dimension: "批次",
+        unit: "片",
+        warehouse: "上海物料站",
+        projectWarehouse: false,
+        status: "有效",
+        updated: "2026-05-29 16:20",
+        selectedIndex: 0,
+        costs: [
+          { price: 418, group: "批次成本", range: "KC-BLP-2026-05-A / KC-BLP-2026-05-B", qty: 360, source: "采购入库", inbound: "RK-20260529-001", updated: "2026-05-29 16:20" },
+          { price: 426, group: "批次成本", range: "KC-BLP-2026-04-C", qty: 180, source: "调整", inbound: "RK-20260520-006", updated: "2026-05-27 14:38" },
+          { price: 405, group: "批次成本", range: "KC-BLP-2026-03-A", qty: 96, source: "人工录入", inbound: "CBLR-20260518-002", updated: "2026-05-18 10:25" },
+        ],
+      },
+      {
+        code: "KC-GMB-1500",
+        name: "钢模板",
+        spec: "1500x3000x80",
+        dimension: "序列号",
+        unit: "块",
+        warehouse: "上海物料站",
+        projectWarehouse: true,
+        status: "已调整",
+        updated: "2026-05-28 18:05",
+        selectedIndex: 1,
+        costs: [
+          { price: 1380, group: "单件成本", range: "KC-GMB-0008~0056", qty: 49, source: "退租入库", inbound: "RK-20260528-008", updated: "2026-05-28 18:05" },
+          { price: 1400, group: "单件成本", range: "KC-GMB-0057~0127", qty: 71, source: "调整", inbound: "CBTZ-20260528-002", updated: "2026-05-28 18:20" },
+          { price: 1320, group: "单件成本", range: "KC-GMB-0128~0140", qty: 13, source: "采购入库", inbound: "RK-20260512-004", updated: "2026-05-12 09:40" },
+        ],
+      },
+      {
+        code: "KC-ZC-609",
+        name: "钢支撑",
+        spec: "609x16x6000",
+        dimension: "批次",
+        unit: "根",
+        warehouse: "上海物料站",
+        projectWarehouse: false,
+        status: "已调整",
+        updated: "2026-05-27 14:38",
+        selectedIndex: 0,
+        costs: [
+          { price: 450, group: "批次成本", range: "KC-ZC-2026-04", qty: 96, source: "调整", inbound: "RK-20260527-006", updated: "2026-05-27 14:38" },
+          { price: 468, group: "批次成本", range: "KC-ZC-2026-06", qty: 64, source: "采购入库", inbound: "RK-20260603-002", updated: "2026-06-03 11:10" },
+        ],
+      },
+      {
+        code: "KC-DS-BZJ",
+        name: "墩身标准节",
+        spec: "2.0m Q355",
+        dimension: "序列号",
+        unit: "节",
+        warehouse: "上海物料站",
+        projectWarehouse: false,
+        status: "有效",
+        updated: "2026-05-25 10:11",
+        selectedIndex: 0,
+        costs: [
+          { price: 1960, group: "单件成本", range: "KC-DS-2026-05-001~024", qty: 24, source: "新生产入库", inbound: "RK-20260525-004", updated: "2026-05-25 10:11" },
+          { price: 1890, group: "单件成本", range: "KC-DS-2026-04-001~018", qty: 18, source: "采购入库", inbound: "RK-20260430-010", updated: "2026-04-30 16:08" },
+        ],
+      },
+      {
+        code: "KC-KJ-M24",
+        name: "高强螺栓",
+        spec: "10.9 级 M24",
+        dimension: "数量",
+        unit: "件",
+        warehouse: "苏州装备中心",
+        projectWarehouse: false,
+        status: "有效",
+        updated: "2026-05-24 11:42",
+        selectedIndex: 0,
+        costs: [
+          { price: 3.8, group: "数量成本", range: "KC-KJ-2026-05", qty: 1880, source: "人工录入", inbound: "CBLR-20260524-009", updated: "2026-05-24 11:42" },
+          { price: 4.1, group: "数量成本", range: "KC-KJ-2026-06", qty: 2400, source: "采购入库", inbound: "RK-20260604-003", updated: "2026-06-04 10:18" },
+        ],
+      },
+      {
+        code: "KC-PJ-DG",
+        name: "爬架导轨",
+        spec: "6m 标准段",
+        dimension: "批次",
+        unit: "根",
+        warehouse: "华东项目仓",
+        projectWarehouse: true,
+        status: "有效",
+        updated: "2026-05-26 09:36",
+        selectedIndex: 0,
+        costs: [
+          { price: 1300, group: "批次成本", range: "KC-PJ-2026-03", qty: 60, source: "采购入库", inbound: "RK-20260526-012", updated: "2026-05-26 09:36" },
+          { price: 1260, group: "批次成本", range: "KC-PJ-2026-02", qty: 42, source: "调整", inbound: "CBTZ-20260521-003", updated: "2026-05-21 17:30" },
+        ],
+      },
+    ];
+    const statusClass = { "有效": "tag-green", "已调整": "tag-blue", "停用": "tag-gray", "待提交": "tag-yellow", "审批中": "tag-orange", "已通过": "tag-green", "驳回": "tag-red" };
+    const sourceClass = { "采购入库": "tag-blue", "新生产入库": "tag-green", "人工录入": "tag-yellow", "调整": "tag-orange", "退租入库": "tag-gray", "混合来源": "tag-gray" };
+    let current = products[0];
+    let expandedKey = "";
+    const $ = (id) => document.getElementById(id);
+    function money(value) { return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function tag(value, map = statusClass) { return `<span class="tag ${map[value] || "tag-gray"}">${value}</span>`; }
+    function selectedCost(item) { return item.costs[item.selectedIndex] || item.costs[0]; }
+    function permittedRows() {
+      const role = $("roleSwitch").value;
+      const topWarehouse = $("topWarehouse").value;
+      if (role === "project") return products.filter(item => item.projectWarehouse);
+      if (role === "master") return products;
+      if (role === "readonly") return products;
+      return products.filter(item => item.warehouse === topWarehouse);
+    }
+    function filteredRows() {
+      const product = $("productFilter").value.trim();
+      const dimension = $("dimensionFilter").value;
+      const source = $("sourceFilter").value;
+      const batch = $("batchFilter").value.trim();
+      const status = $("statusFilter").value;
+      return permittedRows().filter(item => {
+        const currentPrice = selectedCost(item);
+        const sourceHit = source === "全部" || item.costs.some(cost => cost.source === source);
+        const batchHit = !batch || item.costs.some(cost => cost.range.includes(batch));
+        return (!product || item.name.includes(product) || item.code.includes(product)) &&
+        (dimension === "全部" || item.dimension === dimension) &&
+        sourceHit &&
+        batchHit &&
+        (status === "全部" || item.status === status)
+          && currentPrice;
+      });
+    }
+    function renderList() {
+      const rows = filteredRows();
+      $("costRows").innerHTML = rows.map((item, index) => {
+        const currentPrice = selectedCost(item);
+        const expanded = expandedKey === item.code;
+        return `
+          <tr>
+            <td><input type="checkbox" aria-label="选择 ${item.code}" ${index === 0 ? "checked" : ""}></td>
+            <td title="${item.code}"><button class="expand-toggle" data-action="expand" data-index="${index}">${expanded ? "⌄" : "›"}</button>${item.code}</td>
+            <td title="${item.name}">${item.name}</td>
+            <td title="${item.spec}">${item.spec}</td>
+            <td>${item.dimension}</td>
+            <td>${item.unit}</td>
+            <td>${item.costs.length} 档</td>
+            <td>¥${money(currentPrice.price)} / ${item.unit}</td>
+            <td>${tag(currentPrice.source, sourceClass)}</td>
+            <td>${item.costs.reduce((sum, cost) => sum + cost.qty, 0)}</td>
+            <td>${tag(item.status)}</td>
+            <td>${item.updated}</td>
+            <td><div class="row-actions"><button data-action="detail" data-index="${index}">查看</button><button data-action="price" data-index="${index}" class="op-cost">成本价格</button></div></td>
+          </tr>
+          ${expanded ? `<tr class="expanded-row"><td></td><td colspan="12"><div class="mini-detail"><span>价格归纳 <strong>${item.costs.map(cost => `¥${money(cost.price)}`).join("、")}</strong></span><span>当前选择 <strong>¥${money(currentPrice.price)} / ${item.unit}</strong></span><span>成本口径 <strong>${currentPrice.group}</strong></span><span>最新来源 <strong>${currentPrice.inbound}</strong></span></div></td></tr>` : ""}
+        `;
+      }).join("");
+      $("emptyState").classList.toggle("hidden", rows.length > 0);
+      $("summaryText").textContent = `共50条`;
+      document.querySelectorAll("[data-action]").forEach(button => {
+        button.onclick = () => {
+          const rowsNow = filteredRows();
+          current = rowsNow[Number(button.dataset.index)] || current;
+          if (button.dataset.action === "expand") {
+            expandedKey = expandedKey === current.code ? "" : current.code;
+            renderList();
+          }
+          if (button.dataset.action === "detail") showDetail();
+          if (button.dataset.action === "price") openCostDialog();
+        };
+      });
+      applyPermissions();
+    }
+    function switchView(viewId) {
+      document.querySelectorAll(".view").forEach(view => view.classList.remove("is-active"));
+      $(viewId).classList.add("is-active");
+      window.location.hash = viewId.replace("View", "");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function setFields(id, fields) {
+      $(id).innerHTML = fields.map(([label, value, wide]) => `<div class="${wide ? "wide" : ""}"><dt>${label}</dt><dd>${value}</dd></div>`).join("");
+    }
+    function showDetail() {
+      const currentPrice = selectedCost(current);
+      setFields("detailBase", [
+        ["产品编码", current.code], ["产品名称", current.name], ["规格型号", current.spec],
+        ["管理维度", current.dimension], ["计量单位", current.unit], ["当前仓库", current.warehouse],
+        ["成本状态", current.status], ["可选价格", `${current.costs.length} 档`], ["更新时间", current.updated],
+      ]);
+      setFields("detailSource", [
+        ["当前成本价格", `¥${money(currentPrice.price)} / ${current.unit}`], ["归纳对象", currentPrice.group], ["成本来源", currentPrice.source],
+        ["批次/资产码", currentPrice.range, true], ["关联入库单", currentPrice.inbound], ["可用数量", `${currentPrice.qty} ${current.unit}`],
+      ]);
+      $("inboundRows").innerHTML = current.costs.map(cost => `<tr><td>¥${money(cost.price)} / ${current.unit}</td><td>${cost.group}</td><td title="${cost.range}">${cost.range}</td><td>${cost.qty} ${current.unit}</td><td>${tag(cost.source, sourceClass)}</td><td>${cost.inbound}</td><td>${cost.updated}</td></tr>`).join("");
+      $("adjustRows").innerHTML = `
+        <li><strong>CBTZ-20260527-002</strong><span>当前成本价格调整为 ¥${money(currentPrice.price)} / ${current.unit}</span><span>李敏 / ${current.updated}</span></li>
+        <li><strong>CBTZ-20260522-006</strong><span>按入库批次和验收数量重新归纳成本价格</span><span>周晨 / 2026-05-22 15:10</span></li>
+      `;
+      $("orderRows").innerHTML = `
+        <tr><td>ZL-20260530-006</td><td>租赁订单</td><td>沪苏湖站房</td><td>${Math.min(currentPrice.qty, 80)}</td><td>¥${money(Math.min(currentPrice.qty, 80) * currentPrice.price)}</td><td>${tag("已通过")}</td></tr>
+        <tr><td>DB-20260525-018</td><td>调拨订单</td><td>汉江桥梁 2 标</td><td>${Math.min(currentPrice.qty, 42)}</td><td>¥${money(Math.min(currentPrice.qty, 42) * currentPrice.price)}</td><td>${tag("审批中")}</td></tr>
+      `;
+      switchView("detailView");
+      applyPermissions();
+    }
+    function showEdit(mode) {
+      const isAdjust = mode === "adjust";
+      const currentPrice = selectedCost(current);
+      $("editHeading").textContent = "成本价格维护";
+      $("editCrumb").textContent = isAdjust ? "修改" : "维护";
+      $("editProduct").value = current.code === "KC-GMB-1500" ? "KC-GMB-1500 钢模板" : current.code === "KC-ZC-609" ? "KC-ZC-609 钢支撑" : "KC-BLP-321 贝雷片";
+      $("editBatch").value = currentPrice.range;
+      $("editDimension").value = current.dimension === "数量" ? "数量" : current.dimension === "序列号" ? "序列号" : "批次";
+      $("editQty").value = currentPrice.qty;
+      $("editUnit").value = money(currentPrice.price);
+      $("editTotal").value = money(currentPrice.qty * currentPrice.price);
+      $("editSource").value = ["采购入库", "新生产入库", "人工录入", "调整"].includes(currentPrice.source) ? currentPrice.source : "人工录入";
+      $("editInbound").value = currentPrice.inbound;
+      $("beforeCost").value = money(currentPrice.price * 0.96);
+      $("afterCost").value = money(currentPrice.price);
+      switchView("editView");
+    }
+    function openCostDialog() {
+      const currentPrice = selectedCost(current);
+      $("costDialogTitle").textContent = `${current.name} - 选择成本价格`;
+      $("costChoiceSummary").innerHTML = `
+        <div><span>产品编码</span><strong>${current.code}</strong></div>
+        <div><span>管理维度</span><strong>${current.dimension}</strong></div>
+        <div><span>当前价格</span><strong>¥${money(currentPrice.price)} / ${current.unit}</strong></div>
+      `;
+      $("costChoiceRows").innerHTML = current.costs.map((cost, index) => `
+        <tr>
+          <td><input type="radio" name="costChoice" value="${index}" ${index === current.selectedIndex ? "checked" : ""}></td>
+          <td>¥${money(cost.price)} / ${current.unit}</td>
+          <td>${cost.group}</td>
+          <td title="${cost.range}">${cost.range}</td>
+          <td>${cost.qty} ${current.unit}</td>
+          <td>${tag(cost.source, sourceClass)}</td>
+          <td>${cost.updated}</td>
+        </tr>
+      `).join("");
+      $("costDialog").classList.add("is-open");
+    }
+    function confirmCostDialog() {
+      const chosen = document.querySelector('input[name="costChoice"]:checked');
+      if (chosen) {
+        current.selectedIndex = Number(chosen.value);
+        current.status = "已调整";
+        current.updated = "2026-06-18 10:30";
+        renderList();
+      }
+      $("costDialog").classList.remove("is-open");
+    }
+    function renderTrace() {
+      const records = products.flatMap((item, i) => [
+        { no: `CBTZ-202605${27 - i}-00${i + 1}`, item, before: (selectedCost(item).price * 0.96), after: selectedCost(item).price, user: ["李敏", "王强", "周晨"][i % 3], reason: i % 2 ? "验收数量复核后重新归纳成本价格" : "选择最新采购入库成本价格", approval: i % 3 === 0 ? "审批中" : "已通过", time: item.updated },
+      ]);
+      $("traceRows").innerHTML = records.map(row => `<tr><td>${row.no}</td><td>${row.item.name}</td><td>${selectedCost(row.item).range}</td><td>¥${money(row.before)} / ${row.item.unit}</td><td>¥${money(row.after)} / ${row.item.unit}</td><td>${row.user}</td><td title="${row.reason}">${row.reason}</td><td>${tag(row.approval)}</td><td>${row.time}</td></tr>`).join("");
+      switchView("traceView");
+    }
+    function applyPermissions() {
+      const role = $("roleSwitch").value;
+      const readonly = role === "readonly";
+      const noBusinessOp = role === "master" || role === "readonly";
+      $("userName").textContent = $("roleSwitch").selectedOptions[0].textContent;
+      $("topWarehouse").style.display = role === "master" ? "none" : "";
+      $("warehouseSwitcherWrap").style.display = role === "master" ? "none" : "";
+      document.querySelectorAll(".op-cost, #detailAdjustBtn, #saveBtn, #submitBtn, #confirmCostBtn").forEach(button => { button.disabled = noBusinessOp; });
+      $("permissionState").classList.add("hidden");
+    }
+    $("queryBtn").onclick = renderList;
+    $("resetBtn").onclick = () => { $("filterForm").reset(); renderList(); };
+    $("adjustTraceBtn").onclick = renderTrace;
+    $("detailTraceBtn").onclick = renderTrace;
+    $("detailAdjustBtn").onclick = openCostDialog;
+    $("closeCostBtn").onclick = $("cancelCostBtn").onclick = () => $("costDialog").classList.remove("is-open");
+    $("confirmCostBtn").onclick = confirmCostDialog;
+    $("roleSwitch").onchange = () => { renderList(); applyPermissions(); };
+    $("topWarehouse").onchange = renderList;
+    document.querySelectorAll(".backBtn").forEach(button => { button.onclick = () => switchView("listView"); });
+    $("saveBtn").onclick = (event) => { event.preventDefault(); switchView("listView"); };
+    $("submitBtn").onclick = (event) => { event.preventDefault(); renderTrace(); };
+    $("traceExportBtn").onclick = () => {};
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash === "detail") showDetail();
+      else if (hash === "edit") showEdit("adjust");
+      else if (hash === "trace") renderTrace();
+      else switchView("listView");
+    });
+    if (window.location.hash === "#trace") renderTrace();
+    else if (window.location.hash === "#detail") showDetail();
+    else if (window.location.hash === "#edit") showEdit("adjust");
+    else renderList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 入库</title>
+  <link rel="stylesheet" href="./inbound.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">科</span>
+        <strong>模架工装管理系统</strong>
+      </div>
+      <nav class="nav">
+        <span>基础数据</span>
+        <button>仓库设置</button>
+        <button>产品分类</button>
+        <button>产品管理/资产档案</button>
+        <button>BOM 清单</button>
+        <span>业务闭环</span>
+        <button>仓库管理</button>
+        <button>租赁订单管理</button>
+        <button>调拨订单管理</button>
+        <button>出库</button>
+        <button class="active">入库</button>
+        <button>盘点</button>
+        <button>翻新</button>
+        <button>改制记录</button>
+        <button>废旧处置</button>
+        <span>统计分析</span>
+        <button>库存/资产利用率分析</button>
+        <button>成本分析</button>
+      </nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">首页 / 资产管理 / <strong>入库</strong></div>
+        <div class="top-actions">
+          <span>当前公司：科创公司</span>
+          <button>反馈</button>
+          <button>通知<span class="dot">5</span></button>
+          <span class="avatar">仓</span>
+          <span>仓库业务操作角色</span>
+        </div>
+      </header>
+
+      <section id="listView" class="view is-active">
+        <div class="page-title">
+          <div>
+            <h1>入库</h1>
+            <span>资产管理 / 入库</span>
+          </div>
+        </div>
+
+        <form class="filter-panel">
+          <label>入库类型
+            <select id="typeFilter">
+              <option>全部</option>
+              <option>采购</option>
+              <option>新生产</option>
+              <option>退租</option>
+              <option>翻新</option>
+              <option>改制入库</option>
+              <option>调拨入库</option>
+            </select>
+          </label>
+          <label>入库单号
+            <input id="noFilter" placeholder="请输入入库单号">
+          </label>
+          <label>来源单据
+            <input id="sourceFilter" placeholder="请输入来源单据号">
+          </label>
+          <label>当前仓库
+            <select id="warehouseFilter">
+              <option>全部</option>
+              <option>上海物料站</option>
+              <option>苏州装备中心</option>
+              <option>华东项目虚拟仓</option>
+            </select>
+          </label>
+          <label>项目
+            <select id="projectFilter">
+              <option>全部</option>
+              <option>汉江桥梁 2 标</option>
+              <option>沪苏湖站房</option>
+              <option>科创中心备料</option>
+            </select>
+          </label>
+          <label>供应商
+            <input id="supplierFilter" placeholder="供应商名称">
+          </label>
+          <label>验收状态
+            <select id="acceptFilter">
+              <option>全部</option>
+              <option>待验收</option>
+              <option>通过</option>
+              <option>异常</option>
+            </select>
+          </label>
+          <label>入库状态
+            <select id="statusFilter">
+              <option>全部</option>
+              <option>待入库</option>
+              <option>部分入库</option>
+              <option>已入库</option>
+            </select>
+          </label>
+          <div class="filter-actions">
+            <button type="button" class="primary" id="queryBtn">查询</button>
+            <button type="button" id="resetBtn">重置</button>
+          </div>
+        </form>
+
+        <section class="table-panel">
+          <div class="table-toolbar">
+            <div class="task-tabs" aria-label="入库任务筛选">
+              <button class="tab active" data-task="all">全部入库单</button>
+              <button class="tab" data-task="pending">待入库任务 <b>6</b></button>
+              <button class="tab" data-task="inspect">待验收 <b>4</b></button>
+              <button class="tab" data-task="cost">待成本录入 <b>3</b></button>
+            </div>
+            <div class="toolbar-actions">
+              <button id="exportBtn">导出</button>
+              <button id="syncBtn">从采购/订单同步</button>
+              <button id="batchHandleBtn">办理入库</button>
+              <button class="primary" id="createBtn">新增入库</button>
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="全选"></th>
+                  <th>入库单号</th>
+                  <th>业务类型</th>
+                  <th>来源单据</th>
+                  <th>入库仓库</th>
+                  <th>物资项数</th>
+                  <th>数量</th>
+                  <th>成本状态</th>
+                  <th>验收状态</th>
+                  <th>确认状态</th>
+                  <th>入库状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="inboundRows"></tbody>
+            </table>
+          </div>
+
+          <div class="empty-state hidden" id="emptyState">
+            <strong>暂无符合条件的入库单</strong>
+            <span>请调整筛选条件后重新查询</span>
+          </div>
+          <div class="empty-state hidden" id="loadingState">
+            <strong>数据加载中</strong>
+            <span>正在读取当前仓库入库台账</span>
+          </div>
+          <div class="empty-state hidden" id="permissionState">
+            <strong>无入库操作权限</strong>
+            <span>当前账号可查看入库记录，不能新增、办理或确认</span>
+          </div>
+          <div class="empty-state hidden" id="integrationState">
+            <strong>未启用外部同步</strong>
+            <span>请使用本地订单或采购记录生成入库单</span>
+          </div>
+
+          <footer class="pagination">
+            <span class="page-total" id="summaryText">共0条</span>
+            <button class="page-btn disabled" aria-label="上一页">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-ellipsis">...</span>
+            <button class="page-btn">8</button>
+            <button class="page-btn" aria-label="下一页">›</button>
+            <select class="page-size" aria-label="每页条数">
+              <option>10条/页</option>
+              <option>20条/页</option>
+              <option>50条/页</option>
+            </select>
+            <span>跳至</span>
+            <input class="page-jump" value="1" aria-label="跳转页码">
+            <span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div>
+            <h1>入库详情</h1>
+            <span>资产管理 / 入库 / 查看详情</span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">返回</button>
+            <button id="detailEditBtn">编辑</button>
+            <button class="primary" id="detailHandleBtn">办理入库</button>
+          </div>
+        </div>
+
+        <div class="detail-layout">
+          <article class="content-panel">
+            <h2>基本信息</h2>
+            <dl class="info-grid" id="detailInfo"></dl>
+          </article>
+          <article class="content-panel">
+            <h2>验收与成本</h2>
+            <dl class="info-grid" id="acceptInfo"></dl>
+          </article>
+          <article class="content-panel">
+            <h2>物资明细</h2>
+            <table class="detail-table">
+              <thead>
+                <tr>
+                  <th>产品</th>
+                  <th>规格</th>
+                  <th>管理维度</th>
+                  <th>批次/资产码</th>
+                  <th>应收数量</th>
+                  <th>实收数量</th>
+                  <th>成本</th>
+                  <th>库区库位</th>
+                  <th>附件</th>
+                  <th>备注</th>
+                </tr>
+              </thead>
+              <tbody id="detailItems"></tbody>
+            </table>
+          </article>
+          <article class="content-panel">
+            <h2>办理记录</h2>
+            <ol class="flow-list" id="processFlow"></ol>
+          </article>
+          <article class="content-panel">
+            <h2>附件</h2>
+            <div class="attachment-grid">
+              <div>验收照片：6 张</div>
+              <div>送货单：已上传</div>
+              <div>过磅单：已上传</div>
+              <div>质检记录：2 份</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="handleView" class="view">
+        <div class="page-title">
+          <div>
+            <h1 id="handleTitle">办理入库</h1>
+            <span>资产管理 / 入库 / 办理</span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">取消</button>
+            <button id="saveDraftBtn">保存草稿</button>
+            <button class="primary" id="submitHandleBtn">提交办理</button>
+          </div>
+        </div>
+
+        <form class="edit-form">
+          <section class="content-panel">
+            <h2>入库信息</h2>
+            <div class="form-grid">
+              <label><span>入库类型</span><select id="handleType"><option>采购</option><option>新生产</option><option>退租</option><option>翻新</option><option>改制入库</option><option>调拨入库</option></select></label>
+              <label><span>来源单据</span><input id="handleSource" value="CG-20260518-011"></label>
+              <label><span>入库仓库</span><select id="handleWarehouse"><option>上海物料站</option><option>苏州装备中心</option><option>华东项目虚拟仓</option></select></label>
+              <label><span>项目</span><select id="handleProject"><option>汉江桥梁 2 标</option><option>沪苏湖站房</option><option>科创中心备料</option><option>华东高架 3 标</option><option>苏州综合管廊二期</option></select></label>
+              <label><span>供应商</span><input id="handleSupplier" value="上海桥装装备有限公司"></label>
+              <label><span>经办人</span><input value="仓库业务操作角色"></label>
+              <label><span>入库日期</span><input value="2026-05-29"></label>
+              <label><span>验收结论</span><select><option>待验收</option><option>可用</option><option>待检</option><option>报废拒收</option><option>部分接收</option></select></label>
+              <label><span>确认人</span><select><option>仓库业务操作角色（确认）</option><option>项目业务操作角色</option><option>公司组织查看角色</option></select></label>
+            </div>
+          </section>
+
+          <section class="content-panel">
+            <div class="section-title-row">
+              <h2>物资明细</h2>
+              <div>
+                <button type="button" id="batchCodeBtn">生成批次</button>
+                <button type="button" id="uniqueCodeBtn">生成一物一码</button>
+                <button type="button" id="manualAddLineBtn">手工新增</button>
+                <button type="button" class="primary" id="addLineBtn">从出库记录选择</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table class="edit-table">
+                <thead>
+                  <tr>
+                    <th>产品</th>
+                    <th>规格</th>
+                    <th>管理维度</th>
+                    <th>批次/资产码</th>
+                    <th>应收数量</th>
+                    <th>实收数量</th>
+                    <th>成本</th>
+                    <th>库区库位</th>
+                    <th>附件</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="handleItems"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="content-panel">
+            <h2>附件与确认</h2>
+            <div class="upload-grid">
+              <button type="button">上传到货照片</button>
+              <button type="button">上传验收照片</button>
+              <button type="button">上传过磅单</button>
+              <button type="button">上传质检记录</button>
+            </div>
+          </section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="outboundPickerMask" class="modal-mask hidden"></div>
+  <section id="outboundPickerModal" class="material-picker-modal hidden" role="dialog" aria-modal="true" aria-labelledby="outboundPickerTitle">
+    <header class="modal-header">
+      <div>
+        <h2 id="outboundPickerTitle">从出库记录选择物资</h2>
+        <span>批量选择已确认出库且仍有可回库数量的物资</span>
+      </div>
+      <button type="button" class="icon-button" id="closeOutboundPicker" aria-label="关闭">×</button>
+    </header>
+    <div class="picker-filters">
+      <label><span>出库单号/项目/物资</span><input id="outboundKeyword" placeholder="请输入出库单号、项目或物资名称"></label>
+      <label><span>业务类型</span><select id="outboundTypeFilter"><option>全部</option><option>租赁</option><option>调拨</option><option>翻新</option><option>改制</option></select></label>
+      <label><span>确认状态</span><select disabled><option>已确认</option></select></label>
+      <div class="picker-query-actions">
+        <button type="button" id="resetOutboundFilter">重置</button>
+        <button type="button" class="primary" id="queryOutbound">查询</button>
+      </div>
+    </div>
+    <div class="material-picker-body">
+      <aside class="order-tree">
+        <div class="tree-heading">
+          <strong>可回库出库记录</strong>
+          <span id="outboundTreeCount">0 单</span>
+        </div>
+        <div id="outboundTree"></div>
+      </aside>
+      <section class="picker-table-panel">
+        <div class="picker-summary">
+          <div>
+            <strong id="selectedOutboundTitle">全部已确认出库记录</strong>
+            <span id="selectedOutboundMeta">请选择左侧出库单查看物资</span>
+          </div>
+          <span>已选 <b id="selectedOutboundMaterialCount">0</b> 项</span>
+        </div>
+        <div class="picker-table-scroll">
+          <table class="picker-table">
+            <thead>
+              <tr>
+                <th><input id="selectAllOutboundMaterials" type="checkbox" aria-label="全选当前物资"></th>
+                <th>来源出库单</th>
+                <th>产品</th>
+                <th>规格</th>
+                <th>管理维度</th>
+                <th>实出数量</th>
+                <th>已回库</th>
+                <th>可回库数量</th>
+                <th>单位</th>
+                <th>批次/资产码</th>
+                <th>原出库库位</th>
+              </tr>
+            </thead>
+            <tbody id="outboundPickerRows"></tbody>
+          </table>
+          <div id="outboundPickerEmpty" class="picker-empty hidden">暂无可回库的出库物资</div>
+        </div>
+      </section>
+    </div>
+    <footer class="modal-footer">
+      <span>物资带入后，可继续填写实收数量、成本、入库库位和验收附件。</span>
+      <div>
+        <button type="button" id="cancelOutboundPicker">取消</button>
+        <button type="button" class="primary" id="confirmOutboundPicker">确定带入</button>
+      </div>
+    </footer>
+  </section>
+
+  <script src="./inbound.js"></script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 租赁规则设置</title>
+  <style>
+    :root {
+      --primary:#2eb3ff; --primary-hover:#53c6ff; --primary-light:#e8faff;
+      --success:#00cf61; --warning:#ffb82e; --danger:#ff3b3b;
+      --text:#212529; --secondary:#8d97ad; --tertiary:#b7c4cc;
+      --border:#dee1e3; --divider:#e9eff4; --page:#edf1f5; --white:#fff;
+      --font:"Microsoft YaHei",Arial,"PingFang SC",Helvetica,sans-serif;
+      --top:40px; --side:136px; --control:32px;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--page); color:var(--text); font:14px/22px var(--font); }
+    button,input,select,textarea { font:inherit; }
+    button { height:32px; padding:0 12px; border:1px solid var(--border); border-radius:3px; background:#fff; color:var(--text); cursor:pointer; white-space:nowrap; }
+    button:hover { border-color:var(--primary); color:var(--primary); }
+    button:disabled { background:#f5f7fa; color:var(--tertiary); cursor:not-allowed; }
+    .primary { border-color:var(--primary); background:var(--primary); color:#fff; }
+    .primary:hover { border-color:var(--primary-hover); background:var(--primary-hover); color:#fff; }
+    .danger-link { color:var(--danger)!important; }
+    input,select,textarea { width:100%; height:32px; padding:0 8px; border:1px solid var(--border); border-radius:3px; background:#fff; color:var(--text); outline:none; }
+    input:focus,select:focus,textarea:focus { border-color:var(--primary); }
+    textarea { height:64px; padding:7px 8px; resize:none; }
+    h1,h2,p { margin:0; }
+    .hidden { display:none!important; }
+    .app { min-height:100vh; padding:var(--top) 0 0 var(--side); }
+    .topbar { position:fixed; z-index:10; top:0; left:0; right:0; height:var(--top); display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-top:3px solid #243f52; border-bottom:1px solid var(--divider); background:#fff; }
+    .brand,.top-tools,.page-actions,.query-actions,.toolbar-actions,.pagination,.row-actions,.calc-actions { display:flex; align-items:center; gap:8px; }
+    .brand-mark { width:24px; height:24px; display:grid; place-items:center; border-radius:3px; background:var(--primary); color:#fff; font-weight:600; }
+    .brand strong { font-size:15px; }
+    .top-tools { color:var(--secondary); font-size:12px; }
+    .top-tools button { height:28px; padding:0 8px; border:0; background:transparent; }
+    .top-tools select { width:146px; height:28px; font-size:12px; }
+    .notice { position:relative; }
+    .notice::after { content:""; position:absolute; top:5px; right:1px; width:6px; height:6px; border-radius:50%; background:var(--danger); }
+    .avatar { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:var(--primary-light); color:var(--primary); }
+    .sidebar { position:fixed; top:var(--top); bottom:0; left:0; width:var(--side); overflow:auto; border-right:1px solid var(--divider); background:#fff; }
+    .collapse { width:100%; height:36px; border:0; border-bottom:1px solid var(--divider); border-radius:0; color:var(--secondary); }
+    nav { padding:8px 0; }
+    .menu,.submenu { width:100%; border:0; border-radius:0; background:#fff; text-align:left; }
+    .menu { height:36px; display:flex; align-items:center; gap:6px; padding:0 8px; font-size:13px; }
+    .menu i { margin-left:auto; color:var(--secondary); font-style:normal; }
+    .menu.open { color:var(--primary); }
+    .submenu { height:32px; padding:0 8px 0 34px; font-size:13px; }
+    .submenu.active,.submenu:hover { background:var(--primary-light); color:var(--primary); }
+    main { min-width:1180px; padding:8px 12px 24px; }
+    .view { display:none; }
+    .view.active { display:block; }
+    .page-title { min-height:40px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding:4px 16px; border:1px solid var(--divider); border-radius:4px; background:#fff; }
+    .page-title h1 { display:inline-block; margin-right:12px; font-size:20px; line-height:32px; font-weight:600; }
+    .page-title span { color:var(--secondary); font-size:12px; }
+    .page-title b { color:var(--primary); font-weight:400; }
+    .query-panel { display:grid; grid-template-columns:repeat(3,minmax(220px,1fr)) auto; gap:12px 20px; margin-bottom:8px; padding:16px; border:1px solid var(--divider); border-radius:4px; background:#fff; }
+    .query-panel label { display:grid; grid-template-columns:76px minmax(0,1fr); align-items:center; gap:8px; color:var(--secondary); }
+    .query-actions { justify-content:flex-end; }
+    .table-shell,.detail-shell,.edit-shell { border:1px solid var(--divider); border-radius:4px; background:#fff; }
+    .table-shell { padding:0 16px 8px; }
+    .table-toolbar { min-height:48px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--divider); }
+    .toolbar-title { font-weight:600; }
+    .table-scroll { width:100%; overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    .rule-table { min-width:1430px; }
+    th,td { height:40px; padding:0 8px; border-bottom:1px solid var(--divider); text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    th { background:#f3f6f9; font-weight:600; }
+    tbody tr:hover td { background:#fbfdff; }
+    .rule-table th:first-child,.rule-table td:first-child { width:40px; text-align:center; }
+    .rule-table th:nth-child(2),.rule-table td:nth-child(2) { width:160px; }
+    .rule-table th:nth-child(3),.rule-table td:nth-child(3) { width:120px; }
+    .rule-table th:nth-child(4),.rule-table td:nth-child(4),.rule-table th:nth-child(5),.rule-table td:nth-child(5) { width:170px; }
+    .rule-table th:nth-child(6),.rule-table td:nth-child(6),.rule-table th:nth-child(7),.rule-table td:nth-child(7) { width:116px; }
+    .rule-table th:nth-child(8),.rule-table td:nth-child(8) { width:86px; }
+    .rule-table th:nth-child(9),.rule-table td:nth-child(9) { width:145px; }
+    .rule-table th:last-child,.rule-table td:last-child { width:190px; }
+    .rule-table th:last-child,.rule-table td:last-child { position:sticky; right:0; z-index:2; background:#fff; box-shadow:-6px 0 8px rgba(36,63,82,.05); }
+    .rule-table th:last-child { z-index:3; background:#f3f6f9; }
+    .rule-table tbody tr:hover td:last-child { background:#fbfdff; }
+    .row-actions { overflow:visible; }
+    .link { height:24px; padding:0 2px; border:0; background:transparent; color:var(--primary); }
+    .tag { height:24px; display:inline-flex; align-items:center; padding:0 8px; border-radius:3px; font-size:12px; }
+    .tag.green { background:#e8ffef; color:#128846; }
+    .tag.gray { background:#f5f7fa; color:var(--secondary); }
+    .tag.blue { background:#e8faff; color:#138bc3; }
+    .tag.orange { background:#fff5e8; color:#b65d00; }
+    .tag.yellow { background:#fffbe8; color:#9b6900; }
+    .pagination { min-height:40px; justify-content:flex-end; padding-top:8px; color:var(--text); font-size:12px; white-space:nowrap; }
+    .page-total { margin-right:8px; color:var(--secondary); }
+    .page-btn { width:24px; height:24px; padding:0; }
+    .page-btn.current { border-color:var(--primary); background:var(--primary); color:#fff; }
+    .page-btn.disabled { background:#f5f7fa; color:var(--tertiary); }
+    .page-size { width:82px; height:28px; margin-left:8px; }
+    .page-jump { width:52px; height:28px; }
+    .empty { min-height:220px; display:grid; place-items:center; align-content:center; gap:6px; color:var(--secondary); text-align:center; }
+    .empty strong { color:var(--text); }
+    .detail-shell,.edit-shell { padding:0 16px; }
+    .block { padding:16px 0; border-bottom:1px solid var(--divider); }
+    .block:last-child { border-bottom:0; }
+    .block h2 { position:relative; margin-bottom:14px; padding-left:10px; font-size:14px; font-weight:600; }
+    .block h2::before { content:""; position:absolute; left:0; top:4px; width:3px; height:14px; background:var(--primary); }
+    .info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px 36px; margin:0; }
+    .info-grid div { display:grid; grid-template-columns:104px minmax(0,1fr); gap:8px; min-height:24px; }
+    .info-grid dt { color:var(--secondary); text-align:right; }
+    .info-grid dd { margin:0; overflow-wrap:anywhere; }
+    .info-grid .wide { grid-column:span 2; }
+    .form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 36px; }
+    .form-item { display:grid; grid-template-columns:104px minmax(0,1fr); align-items:center; gap:8px; }
+    .form-label { justify-self:end; color:var(--secondary); font-size:12px; text-align:right; }
+    .required .form-label::before { content:"*"; margin-right:4px; color:var(--danger); }
+    .form-item.full { grid-column:1/-1; }
+    .form-item.wide { grid-column:span 2; }
+    .check-group { min-height:32px; display:flex; align-items:center; gap:18px; }
+    .check-group label { display:flex; align-items:center; gap:6px; color:var(--text); white-space:nowrap; }
+    .check-group input { width:14px; height:14px; }
+    .suffix { position:relative; }
+    .suffix input { padding-right:38px; }
+    .suffix span { position:absolute; right:9px; top:5px; color:var(--secondary); font-size:12px; }
+    .calc-panel { display:grid; grid-template-columns:repeat(5,minmax(150px,1fr)) auto; gap:12px 16px; align-items:end; padding:14px; border:1px solid var(--divider); background:#fbfdff; }
+    .calc-field { display:grid; gap:5px; }
+    .calc-field span { color:var(--secondary); font-size:12px; }
+    .calc-result { margin-top:12px; padding:14px 16px; border-left:3px solid var(--primary); background:var(--primary-light); }
+    .calc-result strong { margin:0 12px; color:#1c8ad2; font-size:22px; }
+    .calc-result span { color:var(--secondary); font-size:12px; }
+    .audit-list { display:grid; gap:8px; }
+    .audit-item { display:grid; grid-template-columns:160px 150px minmax(0,1fr) 120px; gap:12px; padding:10px 12px; border:1px solid var(--divider); background:#fbfdff; }
+    .audit-item span { color:var(--secondary); font-size:12px; }
+    .mask { position:fixed; inset:0; z-index:20; display:none; align-items:center; justify-content:center; background:rgba(36,63,82,.72); }
+    .mask.open { display:flex; }
+    .dialog { width:500px; border-radius:4px; background:#fff; box-shadow:0 16px 42px rgba(36,63,82,.25); }
+    .dialog header { height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:1px solid var(--divider); }
+    .dialog h2 { font-size:18px; }
+    .dialog-body { padding:24px 28px; text-align:center; }
+    .warn-icon { width:44px; height:44px; display:grid; place-items:center; margin:0 auto 14px; border-radius:50%; background:#fffbe8; color:#a86d00; font-size:24px; }
+    .dialog-body p { color:var(--secondary); }
+    .dialog footer { display:flex; justify-content:center; gap:8px; padding:0 20px 20px; }
+    .toast { position:fixed; z-index:30; top:54px; left:50%; display:none; min-width:260px; padding:10px 16px; transform:translateX(-50%); border:1px solid #b7efd0; border-radius:3px; background:#f0fff6; color:#128846; text-align:center; }
+    .toast.show { display:block; }
+    @media (max-width:1440px) {
+      .query-panel { grid-template-columns:repeat(3,minmax(210px,1fr)); }
+      .query-actions { grid-column:1/-1; }
+      .info-grid,.form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .calc-panel { grid-template-columns:repeat(3,minmax(180px,1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">科</span><strong>模架工装管理系统</strong></div>
+      <div class="top-tools">
+        <span id="warehouseLabel">当前仓库</span>
+        <select id="warehouseSwitch"><option>上海物料站</option><option>苏州装备中心</option><option>南京周转库</option></select>
+        <span>权限视角</span>
+        <select id="roleSwitch"><option value="operator">仓库业务操作角色</option><option value="master">中心主数据管理员</option><option value="viewer">公司组织查看角色</option></select>
+        <button>意见反馈</button><button>主题</button><button class="notice">通知</button>
+        <span class="avatar">仓</span><span id="roleName">仓库业务操作角色</span><span>⌄</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="collapse">☰</button>
+      <nav>
+        <button class="menu open"><span>▦</span>基础设置<i>⌄</i></button>
+        <button class="submenu">仓库设置</button><button class="submenu">产品分类</button><button class="submenu">产品清单</button>
+        <button class="submenu">成本信息管理</button><button class="submenu">BOM 清单</button><button class="submenu active">租赁规则设置</button>
+        <button class="menu"><span>▤</span>订单管理<i>›</i></button>
+        <button class="submenu">需求计划管理</button><button class="submenu">租赁订单管理</button><button class="submenu">调拨订单管理</button>
+        <button class="menu"><span>▥</span>仓库业务<i>›</i></button>
+        <button class="submenu">仓库管理</button><button class="submenu">出库</button><button class="submenu">入库</button>
+        <button class="menu"><span>□</span>结算分析<i>›</i></button>
+        <button class="submenu">外部结算管理</button><button class="submenu">成本分析</button>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="listView" class="view active">
+        <div class="page-title"><div><h1>租赁规则设置</h1><span>基础设置 &gt; <b>租赁规则设置</b></span></div></div>
+        <form class="query-panel" id="queryForm">
+          <label><span>规则名称</span><input id="nameFilter" placeholder="请输入规则名称"></label>
+          <label><span>费用类型</span><select id="feeFilter"><option>全部</option><option>按时间</option><option>按工程量/数量</option><option>一口价</option></select></label>
+          <label><span>启用状态</span><select id="statusFilter"><option>全部</option><option>启用</option><option>停用</option></select></label>
+          <div class="query-actions"><button type="button" class="primary" id="queryBtn">查询</button><button type="button" id="resetBtn">重置</button></div>
+        </form>
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <div class="toolbar-title">当前仓库规则列表</div>
+            <div class="toolbar-actions"><button id="copyBtn">复制规则</button><button id="exportBtn">导出</button><button id="createBtn" class="primary">新增规则</button></div>
+          </div>
+          <div class="table-scroll">
+            <table class="rule-table">
+              <thead><tr><th><input id="checkAll" type="checkbox" aria-label="全选"></th><th>规则名称</th><th>适用仓库</th><th>租赁开始口径</th><th>租赁结束口径</th><th>结算周期</th><th>费用类型</th><th>是否启用</th><th>更新时间</th><th>操作</th></tr></thead>
+              <tbody id="ruleRows"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty hidden"><strong>暂无符合条件的租赁规则</strong><span>请调整筛选条件后重新查询</span></div>
+          <footer class="pagination">
+            <span class="page-total">共50条</span><button class="page-btn disabled">‹</button><button class="page-btn current">1</button><button class="page-btn">2</button><button class="page-btn">3</button><span>...</span><button class="page-btn">5</button><button class="page-btn">›</button>
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select><span>跳至</span><input class="page-jump" value="1"><span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div><h1>租赁规则详情</h1><span>基础设置 &gt; 租赁规则设置 &gt; <b>详情</b></span></div>
+          <div class="page-actions"><button class="backBtn">← 返回</button><button id="detailEditBtn">编辑</button><button id="detailCopyBtn">复制规则</button></div>
+        </div>
+        <div class="detail-shell">
+          <section class="block"><h2>基本信息</h2><dl class="info-grid" id="detailBase"></dl></section>
+          <section class="block"><h2>计租口径</h2><dl class="info-grid" id="detailBilling"></dl></section>
+          <section class="block">
+            <h2>规则试算</h2>
+            <div class="calc-panel">
+              <label class="calc-field"><span>开始日期</span><input id="calcStart" type="date" value="2026-06-01"></label>
+              <label class="calc-field"><span>结束日期</span><input id="calcEnd" type="date" value="2026-07-15"></label>
+              <label class="calc-field"><span>数量/工程量</span><input id="calcQty" value="20"></label>
+              <label class="calc-field"><span>单价</span><input id="calcPrice" value="180"></label>
+              <label class="calc-field"><span>一口价</span><input id="calcFixed" value="36000"></label>
+              <div class="calc-actions"><button class="primary" id="calcBtn">开始试算</button><button id="calcReset">重置</button></div>
+            </div>
+            <div class="calc-result"><span>试算金额</span><strong id="calcAmount">¥54,000.00</strong><span id="calcExplain">按月计费，共 1.5 个结算周期，20 件 × 180 元 × 1.5。</span></div>
+          </section>
+          <section class="block"><h2>确认记录</h2><div class="audit-list" id="auditList"></div></section>
+        </div>
+      </section>
+
+      <section id="editView" class="view">
+        <div class="page-title">
+          <div><h1 id="editTitle">新增租赁规则</h1><span>基础设置 &gt; 租赁规则设置 &gt; <b id="editCrumb">新增</b></span></div>
+          <div class="page-actions"><button class="backBtn">取消</button><button id="saveBtn">保存</button><button id="submitBtn" class="primary">提交确认</button></div>
+        </div>
+        <form class="edit-shell" id="ruleForm">
+          <section class="block">
+            <h2>基本信息</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span class="form-label">规则名称</span><input id="editName" placeholder="请输入规则名称"></label>
+              <label class="form-item required"><span class="form-label">适用仓库</span><input id="editWarehouse" disabled></label>
+              <label class="form-item required"><span class="form-label">状态</span><select id="editStatus"><option>启用</option><option>停用</option></select></label>
+            </div>
+          </section>
+          <section class="block">
+            <h2>计租口径</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span class="form-label">开始时间口径</span><select id="editStart"><option>实际出库确认日</option><option>项目签收日</option><option>合同约定起租日</option></select></label>
+              <label class="form-item required"><span class="form-label">结束时间口径</span><select id="editEnd"><option>退租入库确认日</option><option>项目退场签收日</option><option>合同约定止租日</option></select></label>
+            </div>
+          </section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="mask" id="confirmMask">
+    <section class="dialog">
+      <header><h2 id="dialogTitle">提交规则确认</h2><button id="dialogClose">×</button></header>
+      <div class="dialog-body"><div class="warn-icon">!</div><strong id="dialogMessage">确认提交该规则调整吗？</strong><p id="dialogSub">提交后由另一名负责人确认，确认通过后规则生效。</p></div>
+      <footer><button id="dialogCancel">取消</button><button id="dialogConfirm" class="primary">确定</button></footer>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const rules = [
+      { id:1, name:"华东月租标准规则", warehouse:"上海物料站", start:"实际出库确认日", end:"退租入库确认日", cycle:"自然月", fee:"按时间", status:"启用", updated:"2026-06-08 16:20", categories:"桥梁模板、钢支撑", precision:"不足半月按半月", fixedPeriod:"首个结算周期", freeDays:3, discount:0, limit:0, remark:"适用于常规周转材料月租业务。", confirm:"已确认" },
+      { id:2, name:"工程量计费规则", warehouse:"上海物料站", start:"项目签收日", end:"项目退场签收日", cycle:"按项目节点", fee:"按工程量/数量", status:"启用", updated:"2026-06-06 11:35", categories:"桥梁模板", precision:"按实际数量", fixedPeriod:"首个结算周期", freeDays:0, discount:5, limit:5000, remark:"按结算周期内确认工程量生成基础金额。", confirm:"已确认" },
+      { id:3, name:"整项目一口价规则", warehouse:"上海物料站", start:"合同约定起租日", end:"合同约定止租日", cycle:"自然月", fee:"一口价", status:"启用", updated:"2026-06-03 09:18", categories:"通用工装", precision:"不足一期按一期", fixedPeriod:"首个结算周期", freeDays:0, discount:0, limit:0, remark:"一口价归入首个结算周期，结算单生成后可调整。", confirm:"已确认" },
+      { id:4, name:"临租按日规则", warehouse:"上海物料站", start:"实际出库确认日", end:"退租入库确认日", cycle:"按日结算", fee:"按时间", status:"停用", updated:"2026-05-28 14:02", categories:"钢支撑、贝雷片", precision:"按实际天数", fixedPeriod:"首个结算周期", freeDays:1, discount:0, limit:0, remark:"临时短租业务使用。", confirm:"已确认" },
+      { id:5, name:"苏州标准月租规则", warehouse:"苏州装备中心", start:"实际出库确认日", end:"退租入库确认日", cycle:"30 天/期", fee:"按时间", status:"启用", updated:"2026-06-07 13:46", categories:"钢支撑、爬架构件", precision:"按实际天数", fixedPeriod:"平均分摊至各周期", freeDays:2, discount:0, limit:0, remark:"每 30 天为一个结算周期。", confirm:"已确认" },
+      { id:6, name:"南京项目一口价", warehouse:"南京周转库", start:"合同约定起租日", end:"合同约定止租日", cycle:"自然月", fee:"一口价", status:"启用", updated:"2026-06-02 10:20", categories:"通用工装", precision:"不足一期按一期", fixedPeriod:"末个结算周期", freeDays:0, discount:0, limit:0, remark:"一口价在末个结算周期生成。", confirm:"待确认" }
+    ];
+    const $ = id => document.getElementById(id);
+    let current = rules[0], editMode = "create", pendingAction = null;
+    const money = n => Number(n).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2});
+    const tag = (text, cls) => `<span class="tag ${cls}">${text}</span>`;
+
+    function allowedRules() {
+      return rules.filter(r => r.warehouse === $("warehouseSwitch").value);
+    }
+    function filteredRules() {
+      const name = $("nameFilter").value.trim(), fee = $("feeFilter").value, status = $("statusFilter").value;
+      return allowedRules().filter(r => (!name || r.name.includes(name)) && (fee === "全部" || r.fee === fee) && (status === "全部" || r.status === status));
+    }
+    function renderList() {
+      const data = filteredRules();
+      $("ruleRows").innerHTML = data.map(r => `<tr>
+        <td><input type="checkbox" data-check="${r.id}" aria-label="选择${r.name}"></td>
+        <td title="${r.name}">${r.name}</td><td>${r.warehouse}</td><td title="${r.start}">${r.start}</td><td title="${r.end}">${r.end}</td>
+        <td>${r.cycle}</td><td>${tag(r.fee,r.fee==="按时间"?"blue":r.fee==="一口价"?"orange":"yellow")}</td>
+        <td>${tag(r.status,r.status==="启用"?"green":"gray")}</td><td>${r.updated}</td>
+        <td><div class="row-actions"><button class="link" data-action="detail" data-id="${r.id}">查看</button><button class="link edit-action" data-action="edit" data-id="${r.id}">编辑</button><button class="link danger-link stop-action" data-action="stop" data-id="${r.id}">${r.status==="启用"?"停用":"启用"}</button></div></td>
+      </tr>`).join("");
+      $("emptyState").classList.toggle("hidden", data.length > 0);
+      document.querySelectorAll("[data-action]").forEach(btn => btn.onclick = () => {
+        current = rules.find(r => r.id === Number(btn.dataset.id)) || current;
+        if (btn.dataset.action === "detail") showDetail();
+        if (btn.dataset.action === "edit") showEdit("edit");
+        if (btn.dataset.action === "stop") openConfirm("status");
+      });
+      applyPermissions();
+    }
+    function switchView(id) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      $(id).classList.add("active");
+      location.hash = id.replace("View","");
+      scrollTo({top:0,behavior:"smooth"});
+    }
+    function fields(id, list) {
+      $(id).innerHTML = list.map(([k,v,wide]) => `<div class="${wide?"wide":""}"><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+    }
+    function showDetail() {
+      fields("detailBase", [["规则名称",current.name],["适用仓库",current.warehouse],["启用状态",tag(current.status,current.status==="启用"?"green":"gray")],["确认状态",tag(current.confirm,current.confirm==="已确认"?"green":"orange")],["更新时间",current.updated]]);
+      fields("detailBilling", [["开始时间口径",current.start],["结束时间口径",current.end]]);
+      $("auditList").innerHTML = `<div class="audit-item"><strong>GZQR-20260608-003</strong><span>李敏 / 发起</span><span>调整计租结束口径</span><span>${tag("已确认","green")}</span></div><div class="audit-item"><strong>GZQR-20260520-008</strong><span>赵倩 / 确认</span><span>确认规则可用于租赁订单计费</span><span>${tag("已确认","green")}</span></div>`;
+      switchView("detailView"); calculate();
+    }
+    function showEdit(mode) {
+      editMode = mode;
+      const copying = mode === "copy", creating = mode === "create";
+      $("editTitle").textContent = creating ? "新增租赁规则" : copying ? "复制租赁规则" : "编辑租赁规则";
+      $("editCrumb").textContent = creating ? "新增" : copying ? "复制" : "编辑";
+      $("editName").value = creating ? "" : copying ? `${current.name}-副本` : current.name;
+      $("editWarehouse").value = $("warehouseSwitch").value;
+      $("editStatus").value = creating || copying ? "启用" : current.status;
+      $("editStart").value = creating ? "实际出库确认日" : current.start;
+      $("editEnd").value = creating ? "退租入库确认日" : current.end;
+      switchView("editView");
+    }
+    function calculate() {
+      const start = new Date($("calcStart").value), end = new Date($("calcEnd").value);
+      const days = Math.max(1,Math.ceil((end-start)/86400000)+1), qty = Number($("calcQty").value)||0, price = Number($("calcPrice").value)||0, fixed = Number($("calcFixed").value)||0;
+      let amount = 0, explain = "";
+      if (current.fee === "一口价") { amount = fixed; explain = `一口价计入${current.fixedPeriod}，基础金额生成后可在结算单中人工调整。`; }
+      else if (current.fee === "按工程量/数量") { amount = qty*price; explain = `${qty} 数量/工程量 × ${price} 元。`; }
+      else {
+        const chargeDays = days;
+        const periods = current.cycle === "按日结算" ? chargeDays : current.precision === "不足半月按半月" ? Math.ceil(chargeDays/15)/2 : chargeDays/30;
+        amount = qty*price*periods;
+        explain = `共 ${days} 天，计费 ${Number(periods.toFixed(2))} 个周期，${qty} 件 × ${price} 元。`;
+      }
+      $("calcAmount").textContent = `¥${money(amount)}`; $("calcExplain").textContent = explain;
+    }
+    function openConfirm(type) {
+      pendingAction = type;
+      if (type === "status") {
+        $("dialogTitle").textContent = current.status === "启用" ? "停用租赁规则" : "启用租赁规则";
+        $("dialogMessage").textContent = `确认${current.status === "启用" ? "停用" : "启用"}“${current.name}”吗？`;
+        $("dialogSub").textContent = "该调整需由另一名负责人确认，确认通过后生效。";
+      } else {
+        $("dialogTitle").textContent = "提交规则确认"; $("dialogMessage").textContent = "确认提交当前租赁规则吗？";
+        $("dialogSub").textContent = "提交后由另一名负责人确认，发起人不能确认自己提交的规则调整。";
+      }
+      $("confirmMask").classList.add("open");
+    }
+    function closeConfirm() { $("confirmMask").classList.remove("open"); pendingAction = null; }
+    function toast(text) { $("toast").textContent = text; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),1800); }
+    function applyPermissions() {
+      const role = $("roleSwitch").value, readonly = role === "viewer";
+      $("roleName").textContent = $("roleSwitch").selectedOptions[0].textContent;
+      $("createBtn").disabled = readonly; $("copyBtn").disabled = readonly; $("exportBtn").disabled = false;
+      $("detailEditBtn").disabled = readonly; $("detailCopyBtn").disabled = readonly;
+      document.querySelectorAll(".edit-action,.stop-action").forEach(b => b.disabled = readonly);
+    }
+    $("queryBtn").onclick = renderList;
+    $("resetBtn").onclick = () => { $("queryForm").reset(); renderList(); };
+    $("warehouseSwitch").onchange = renderList;
+    $("roleSwitch").onchange = renderList;
+    $("createBtn").onclick = () => showEdit("create");
+    $("copyBtn").onclick = () => {
+      const checked = document.querySelector("[data-check]:checked");
+      if (!checked) return toast("请先选择一条需要复制的规则");
+      current = rules.find(r => r.id === Number(checked.dataset.check)); showEdit("copy");
+    };
+    $("detailCopyBtn").onclick = () => showEdit("copy");
+    $("detailEditBtn").onclick = () => showEdit("edit");
+    $("exportBtn").onclick = () => toast("已按当前筛选条件生成导出任务");
+    document.querySelectorAll(".backBtn").forEach(b => b.onclick = () => switchView("listView"));
+    $("saveBtn").onclick = e => { e.preventDefault(); toast("规则草稿已保存"); };
+    $("submitBtn").onclick = e => { e.preventDefault(); if (!$("editName").value.trim()) return toast("请输入规则名称"); openConfirm("submit"); };
+    $("calcBtn").onclick = calculate;
+    $("calcReset").onclick = () => { $("calcStart").value="2026-06-01"; $("calcEnd").value="2026-07-15"; $("calcQty").value=20; $("calcPrice").value=180; $("calcFixed").value=36000; calculate(); };
+    $("dialogClose").onclick = $("dialogCancel").onclick = closeConfirm;
+    $("dialogConfirm").onclick = () => {
+      if (pendingAction === "status") current.confirm = "待确认";
+      closeConfirm(); switchView("listView"); renderList(); toast("已提交另一名负责人确认");
+    };
+    $("checkAll").onchange = e => document.querySelectorAll("[data-check]").forEach(c => c.checked = e.target.checked);
+    window.addEventListener("hashchange", () => {
+      const hash = location.hash.slice(1);
+      if (hash === "detail") showDetail();
+      else if (hash === "edit") showEdit(editMode);
+      else if (hash !== "list") switchView("listView");
+    });
+    renderList();
+  </script>
+</body>
+</html>

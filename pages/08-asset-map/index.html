@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模架工装管理系统 - 资产地图</title>
+    <link rel="stylesheet" href="../../shared/asset-map.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">科</span>
+          <strong>模架工装管理系统</strong>
+        </div>
+        <div class="top-actions">
+          <button type="button" class="tool-btn">意见反馈</button>
+          <button type="button" class="icon-btn" title="主题">□</button>
+          <button type="button" class="icon-btn notify" title="通知">9</button>
+          <span class="avatar">管</span>
+          <span class="user">中心管理员</span>
+          <span class="arrow">⌄</span>
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <button class="collapse-btn" type="button" title="收起菜单">☰</button>
+        <nav>
+          <p>基础数据</p>
+          <button type="button">仓库设置</button>
+          <button type="button">产品分类</button>
+          <button type="button">产品清单</button>
+          <button type="button">BOM 清单</button>
+          <p>资产仓库</p>
+          <button type="button" class="active">资产地图</button>
+          <button type="button">仓库管理</button>
+          <button type="button">出库</button>
+          <button type="button">入库</button>
+          <button type="button">盘点</button>
+          <p>订单管理</p>
+          <button type="button">需求计划</button>
+          <button type="button">租赁订单</button>
+          <button type="button">调拨订单</button>
+        </nav>
+      </aside>
+
+      <main class="page-main">
+        <section class="page-title">
+          <div>
+            <h1>资产地图</h1>
+            <span>首页 / 资产仓库 / <b>资产地图</b></span>
+          </div>
+        </section>
+
+        <section class="query-panel">
+          <label class="span-4">
+            <span>需求物资清单</span>
+            <button id="demandPicker" class="selector-btn" type="button">墩身标准节 2.0m 120 块、连接螺栓 M20 3000 件、钢模板 1500x1000 80 块</button>
+          </label>
+          <label>
+            <span>公司</span>
+            <select id="companyFilter">
+              <option>全部</option>
+              <option selected>科创公司</option>
+              <option>路桥公司</option>
+              <option>发展公司</option>
+              <option>一公司基础公司</option>
+            </select>
+          </label>
+          <label>
+            <span>地区</span>
+            <select id="regionFilter">
+              <option>全部</option>
+              <option selected>华东片区</option>
+              <option>华中片区</option>
+              <option>西南片区</option>
+              <option>华北片区</option>
+            </select>
+          </label>
+          <label>
+            <span>仓库类型</span>
+            <select id="typeFilter">
+              <option>全部</option>
+              <option>物料站</option>
+              <option>项目临时点</option>
+            </select>
+          </label>
+          <label>
+            <span>产品分类</span>
+            <select id="categoryFilter">
+              <option>全部</option>
+              <option selected>模架体系</option>
+              <option>集成工装</option>
+              <option>大型设备</option>
+              <option>低值辅材</option>
+            </select>
+          </label>
+          <label>
+            <span>库存状态</span>
+            <select id="stockFilter">
+              <option selected>全部</option>
+              <option>可用</option>
+              <option>部分缺货</option>
+              <option>预计释放</option>
+              <option>待翻新</option>
+            </select>
+          </label>
+          <label>
+            <span>预计释放时间</span>
+            <select id="releaseFilter">
+              <option>全部</option>
+              <option selected>30 天内</option>
+              <option>7 天内</option>
+              <option>60 天内</option>
+              <option>90 天内</option>
+            </select>
+          </label>
+          <label>
+            <span>距离范围</span>
+            <select id="distanceFilter">
+              <option>全部</option>
+              <option>100km 内</option>
+              <option selected>300km 内</option>
+              <option>500km 内</option>
+              <option>1000km 内</option>
+            </select>
+          </label>
+          <label class="span-2">
+            <span>收货地址</span>
+            <input id="addressInput" value="上海市嘉定区安亭镇项目部" readonly />
+          </label>
+          <div class="query-actions">
+            <button id="query" class="primary" type="button">搜索</button>
+            <button id="reset" type="button">重置</button>
+            <button id="syncPlan" type="button">生成需求计划</button>
+          </div>
+        </section>
+
+        <section class="map-workspace">
+          <aside class="result-panel">
+            <div class="result-head">
+              <div>
+                <h2>可调资产列表</h2>
+                <span id="resultSummary">共 0 个仓库</span>
+              </div>
+              <div class="sort-tabs">
+                <button id="sortMatch" class="active" type="button">匹配率</button>
+                <button id="sortDistance" type="button">距离</button>
+              </div>
+            </div>
+            <div id="warehouseList" class="warehouse-list"></div>
+            <div id="empty" class="empty hidden">
+              <strong>暂无匹配仓库</strong>
+              <span>请调整筛选条件后重新搜索。</span>
+            </div>
+            <div id="loadMore" class="scroll-tip">向下滚动加载更多</div>
+          </aside>
+
+          <section class="map-panel">
+            <div class="map-toolbar">
+              <span>物料站</span>
+              <span>项目临时点</span>
+              <div class="map-zoom">
+                <button type="button">+</button>
+                <button type="button">-</button>
+              </div>
+            </div>
+            <div class="china-map" aria-label="中国地图资产点位">
+              <div class="map-roads"></div>
+              <div class="china-shape" aria-hidden="true"></div>
+              <div id="mapPoints"></div>
+              <div class="scale-line">100 公里</div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="mask" class="mask hidden"></div>
+
+    <section id="demandModal" class="modal demand-modal hidden">
+      <header><h2>编辑需求物资清单</h2><button class="closeModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div class="current-demand">
+          <div class="table-actionbar">
+            <div class="block-title">当前需求物资清单</div>
+            <div>
+              <button id="chooseProducts" type="button">从产品清单选择</button>
+              <button id="chooseBom" type="button">从 BOM 清单带入</button>
+              <button id="importDemand" type="button">导入需求清单</button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>物资名称</th><th>规格型号</th><th>需求数量</th><th>单位</th><th>来源</th><th>操作</th></tr></thead>
+            <tbody id="demandRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <footer><button class="closeModal" type="button">取消</button><button id="applyDemand" class="primary" type="button">确认清单</button></footer>
+    </section>
+
+    <section id="productModal" class="modal small hidden">
+      <header><h2>从产品清单选择</h2><button class="backDemandModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div id="productOptions" class="choice-list"></div>
+      </div>
+      <footer><button class="backDemandModal" type="button">取消</button><button id="applyProductPick" class="primary" type="button">带入清单</button></footer>
+    </section>
+
+    <section id="bomModal" class="modal small hidden">
+      <header><h2>从 BOM 清单带入</h2><button class="backDemandModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div id="bomOptions" class="choice-list"></div>
+      </div>
+      <footer><button class="backDemandModal" type="button">取消</button><button id="applyBomPick" class="primary" type="button">带入清单</button></footer>
+    </section>
+
+    <section id="importModal" class="modal small hidden">
+      <header><h2>导入需求清单</h2><button class="backDemandModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div class="upload-box">
+          <strong>选择需求清单文件</strong>
+          <span>支持 Excel 模板字段：物资名称、规格型号、需求数量、单位</span>
+          <button id="mockImport" type="button">选择文件</button>
+        </div>
+      </div>
+      <footer><button class="backDemandModal" type="button">取消</button><button id="applyImport" class="primary" type="button">导入并带入</button></footer>
+    </section>
+
+    <section id="addressModal" class="modal address-modal hidden">
+      <header><h2>选择收货地址</h2><button class="closeModal" type="button">×</button></header>
+      <div class="modal-body">
+        <label><span>手动输入地址</span><input id="addressManual" value="上海市嘉定区安亭镇项目部" /></label>
+        <div class="address-map">
+          <button class="pick-point active" data-address="上海市嘉定区安亭镇项目部" style="left:70%;top:60%" type="button">上海</button>
+          <button class="pick-point" data-address="江苏省苏州市工业园区高架项目部" style="left:73%;top:55%" type="button">苏州</button>
+          <button class="pick-point" data-address="湖北省武汉市蔡甸区桥梁项目部" style="left:52%;top:60%" type="button">武汉</button>
+          <span>可手动输入地址，也可在地图上选择收货点</span>
+        </div>
+      </div>
+      <footer><button class="closeModal" type="button">取消</button><button id="useAddress" class="primary" type="button">使用地址</button></footer>
+    </section>
+
+    <section id="matchModal" class="modal hidden">
+      <header><h2 id="matchTitle">匹配明细</h2><button class="closeModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div id="matchSummary" class="match-summary"></div>
+        <h3>已匹配物资</h3>
+        <table><thead><tr><th>物资</th><th>需求数量</th><th>匹配数量</th><th>状态</th></tr></thead><tbody id="matchedRows"></tbody></table>
+        <h3>待翻新物资</h3>
+        <table><thead><tr><th>物资</th><th>数量</th><th>预计完成</th><th>状态</th></tr></thead><tbody id="refurbishRows"></tbody></table>
+        <h3>预计释放物资明细</h3>
+        <table><thead><tr><th>来源项目</th><th>物资</th><th>数量</th><th>释放时间</th></tr></thead><tbody id="releaseRows"></tbody></table>
+        <h3>缺货物资明细</h3>
+        <table><thead><tr><th>物资</th><th>缺口</th><th>建议</th><th>成本状态</th></tr></thead><tbody id="shortageRows"></tbody></table>
+      </div>
+      <footer><button class="closeModal" type="button">关闭</button><button class="primary" type="button">生成调拨建议</button></footer>
+    </section>
+
+    <section id="warehouseModal" class="modal warehouse-modal hidden">
+      <header><h2 id="warehouseTitle">仓库详情</h2><button class="closeModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div id="warehouseSummary" class="detail-grid"></div>
+        <div class="detail-tabs">
+          <button id="demandTab" class="active" type="button">需求满足情况</button>
+          <button id="inventoryTab" type="button">最新库存清单</button>
+        </div>
+        <section id="demandPanel" class="tab-panel">
+          <div id="demandSatisfaction" class="match-summary"></div>
+          <table>
+            <thead><tr><th>物资名称</th><th>规格型号</th><th>需求数量</th><th>当前可用</th><th>缺口</th><th>是否满足</th></tr></thead>
+            <tbody id="satisfactionRows"></tbody>
+          </table>
+        </section>
+        <section id="inventoryPanel" class="tab-panel hidden">
+          <table>
+            <thead><tr><th>物资名称</th><th>规格型号</th><th>库存状态</th><th>可用数量</th><th>锁定数量</th><th>预计释放</th><th>库区库位</th></tr></thead>
+            <tbody id="inventoryRows"></tbody>
+          </table>
+        </section>
+      </div>
+      <footer><button class="closeModal" type="button">关闭</button><button class="primary" type="button">生成调拨建议</button></footer>
+    </section>
+
+    <section id="planModal" class="modal plan-modal hidden">
+      <header><h2>同步生成需求计划</h2><button class="closeModal" type="button">×</button></header>
+      <div class="modal-body">
+        <div id="planSummary" class="detail-grid"></div>
+        <h3>带入需求物资清单</h3>
+        <table><thead><tr><th>物资名称</th><th>规格型号</th><th>需求数量</th><th>单位</th><th>来源</th></tr></thead><tbody id="planDemandRows"></tbody></table>
+        <h3>带入仓库匹配数据</h3>
+        <table><thead><tr><th>仓库名称</th><th>仓库类型</th><th>需求匹配率</th><th>匹配库存</th><th>缺口</th><th>距离</th></tr></thead><tbody id="planWarehouseRows"></tbody></table>
+      </div>
+      <footer><button class="closeModal" type="button">取消</button><button id="confirmPlanSync" class="primary" type="button">确认生成需求计划</button></footer>
+    </section>
+
+    <script src="../../shared/asset-map.js"></script>
+  </body>
+</html>

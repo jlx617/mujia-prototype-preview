@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 设计档案库</title>
+  <link rel="stylesheet" href="./design-archive.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="global-topbar">
+      <div class="brand">
+        <span class="brand-mark">科</span>
+        <strong>模架工装管理系统</strong>
+      </div>
+      <div class="top-tools">
+        <button>意见反馈</button>
+        <button>主题</button>
+        <button class="notice-dot">通知</button>
+        <span class="avatar">设</span>
+        <span>设计人员</span>
+        <span class="role-tag">图纸下载已授权</span>
+        <span>⌄</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="collapse">☰</button>
+      <nav>
+        <div class="menu-section">
+          <button class="menu-item"><span>▦</span>基础设置<i>›</i></button>
+          <button class="submenu">仓库设置</button>
+          <button class="submenu">产品分类</button>
+          <button class="submenu">产品清单</button>
+          <button class="submenu">BOM 清单</button>
+        </div>
+        <div class="menu-section">
+          <button class="menu-item open"><span>▧</span>设计管理<i>⌄</i></button>
+          <button class="submenu active">设计档案库</button>
+        </div>
+        <div class="menu-section">
+          <button class="menu-item"><span>▤</span>订单管理<i>›</i></button>
+          <button class="submenu">需求计划管理</button>
+          <button class="submenu">租赁订单管理</button>
+          <button class="submenu">调拨订单管理</button>
+          <button class="submenu">采购订单管理</button>
+        </div>
+        <div class="menu-section">
+          <button class="menu-item"><span>▥</span>仓库业务<i>›</i></button>
+          <button class="submenu">出库</button>
+          <button class="submenu">入库</button>
+          <button class="submenu">盘点</button>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="page-main">
+      <section id="listView" class="page-view">
+        <div class="page-title">
+          <div>
+            <h1>设计档案库</h1>
+            <span>设计管理 &gt; <b>设计档案库</b></span>
+          </div>
+        </div>
+
+        <section class="query-panel">
+          <label><span>档案名称/编号</span><input id="keywordFilter" placeholder="请输入档案名称或编号"></label>
+          <label><span>项目</span><select id="projectFilter"><option>全部</option><option>华东高架 3 标</option><option>沪苏湖站房</option><option>汉江桥梁 2 标</option><option>苏州综合管廊二期</option></select></label>
+          <label><span>关联 BOM</span><input id="bomFilter" placeholder="请输入 BOM 编号"></label>
+          <label><span>文件类型</span><select id="typeFilter"><option>全部</option><option>PDF</option><option>DWG</option><option>Excel</option><option>图片</option><option>其他</option></select></label>
+          <label><span>保密等级</span><select id="secretFilter"><option>全部</option><option>普通</option><option>涉密</option></select></label>
+          <label><span>上传时间</span><div class="date-range"><input id="startDate" type="date"><em>至</em><input id="endDate" type="date"></div></label>
+          <div class="query-actions"><button id="queryBtn" class="primary">查询</button><button id="resetBtn">重置</button></div>
+        </section>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <strong>档案主列表</strong>
+            <div class="toolbar-actions">
+              <button id="exportBtn">导出目录</button>
+              <button id="newFolderBtn">新增目录</button>
+              <button id="uploadBtn" class="primary">上传档案</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>档案编号</th>
+                  <th>档案名称</th>
+                  <th>文件类型</th>
+                  <th>关联项目</th>
+                  <th>关联 BOM</th>
+                  <th>版本</th>
+                  <th>保密等级</th>
+                  <th>上传人</th>
+                  <th>确认状态</th>
+                  <th>更新时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="archiveRows"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state hidden">
+              <strong>暂无符合条件的设计档案</strong>
+              <span>请调整筛选条件后重新查询</span>
+            </div>
+          </div>
+          <div class="pagination">
+            <span class="page-total">共50条</span>
+            <button class="page-btn disabled" aria-label="上一页">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-ellipsis">...</span>
+            <button class="page-btn">5</button>
+            <button class="page-btn" aria-label="下一页">›</button>
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <span>跳至</span>
+            <input class="page-jump" value="1">
+            <span>页</span>
+          </div>
+        </section>
+      </section>
+
+      <section id="detailView" class="page-view hidden">
+        <div class="page-title">
+          <div>
+            <h1 id="detailTitle">设计档案详情</h1>
+            <span>设计管理 &gt; 设计档案库 &gt; <b>详情</b></span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">← 返回</button>
+            <button id="detailDownloadBtn">下载附件</button>
+            <button id="detailEditBtn" class="primary">编辑</button>
+          </div>
+        </div>
+        <section class="detail-panel">
+          <article class="info-block">
+            <h2>文件信息</h2>
+            <div id="fileInfo" class="info-grid"></div>
+          </article>
+          <article class="info-block">
+            <h2>关联业务</h2>
+            <div id="businessInfo" class="info-grid"></div>
+          </article>
+          <article class="info-block">
+            <h2>版本记录</h2>
+            <div class="sub-table">
+              <table>
+                <thead><tr><th>版本</th><th>文件名称</th><th>上传人</th><th>上传时间</th><th>确认状态</th><th>确认人</th><th>操作</th></tr></thead>
+                <tbody id="versionRows"></tbody>
+              </table>
+            </div>
+          </article>
+          <article class="info-block">
+            <h2>附件列表</h2>
+            <div id="attachmentList" class="attachment-list"></div>
+          </article>
+          <article class="info-block">
+            <h2>下载记录</h2>
+            <div class="sub-table">
+              <table>
+                <thead><tr><th>下载人</th><th>所属角色</th><th>下载版本</th><th>下载时间</th><th>授权结果</th></tr></thead>
+                <tbody id="downloadRows"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section id="editView" class="page-view hidden">
+        <div class="page-title">
+          <div>
+            <h1 id="editTitle">上传设计档案</h1>
+            <span>设计管理 &gt; 设计档案库 &gt; <b id="editCrumb">上传</b></span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">取消</button>
+            <button id="saveBtn">保存草稿</button>
+            <button id="submitBtn" class="primary">提交确认</button>
+          </div>
+        </div>
+        <form class="edit-panel" onsubmit="return false">
+          <section class="info-block">
+            <h2>档案信息</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span class="form-label">档案编号</span><input id="editCode" value="系统自动生成" disabled></label>
+              <label class="form-item required"><span class="form-label">档案名称</span><input id="editName" placeholder="请输入档案名称"></label>
+              <label class="form-item required"><span class="form-label">文件类型</span><select id="editType"><option>PDF</option><option>DWG</option><option>Excel</option><option>图片</option><option>其他</option></select></label>
+              <label class="form-item required"><span class="form-label">版本号</span><input id="editVersion" value="V1.0"></label>
+              <label class="form-item required"><span class="form-label">保密等级</span><select id="editSecret"><option>普通</option><option>涉密</option></select></label>
+              <label class="form-item"><span class="form-label">所属目录</span><select><option>项目图纸 / 施工图</option><option>设计清单</option><option>BOM 文件</option><option>变更资料</option></select></label>
+            </div>
+          </section>
+          <section class="info-block">
+            <h2>关联业务</h2>
+            <div class="form-grid">
+              <label class="form-item required"><span class="form-label">关联项目</span><select id="editProject"><option>华东高架 3 标</option><option>沪苏湖站房</option><option>汉江桥梁 2 标</option><option>苏州综合管廊二期</option></select></label>
+              <label class="form-item"><span class="form-label">关联 BOM</span><input id="editBom" placeholder="请输入 BOM 编号"></label>
+              <label class="form-item"><span class="form-label">关联订单</span><input id="editOrder" placeholder="请输入租赁/调拨/采购订单号"></label>
+              <label class="form-item full"><span class="form-label">档案说明</span><textarea id="editRemark" placeholder="请输入文件用途、适用范围或版本说明"></textarea></label>
+            </div>
+          </section>
+          <section class="info-block">
+            <h2>附件上传</h2>
+            <div class="upload-panel" id="uploadPanel">
+              <div>
+                <span class="upload-icon">⇧</span>
+                <strong>点击选择或拖拽文件到此处</strong>
+                <p>支持 PDF、DWG、Excel、图片及压缩文件，单个文件不超过 200MB</p>
+                <button id="chooseFileBtn" type="button">选择文件</button>
+              </div>
+            </div>
+            <div id="selectedFile" class="selected-file hidden"><span>墩身模板总装图-V2.1.dwg</span><em>36.8 MB</em><button type="button">移除</button></div>
+          </section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="mask" class="mask hidden"></div>
+  <section id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <header><h2 id="modalTitle">操作确认</h2><button id="closeModalBtn">×</button></header>
+    <div id="modalBody" class="modal-body"></div>
+    <footer><button id="cancelModalBtn">取消</button><button id="confirmModalBtn" class="primary">确定</button></footer>
+  </section>
+  <div id="toast" class="toast hidden"></div>
+  <script src="./design-archive.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 外部结算管理</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="global-topbar">
+      <div class="brand"><span class="brand-mark">科</span><strong>模架工装管理系统</strong></div>
+      <div class="top-tools">
+        <label class="warehouse-switch">当前仓库
+          <select id="warehouseSwitch"><option>上海物料站</option><option>苏州装备中心</option><option>华东项目仓库</option></select>
+        </label>
+        <button>意见反馈</button><button>主题</button><button class="notice">通知<i></i></button>
+        <span class="avatar">商</span><span>商务人员</span><span>⌄</span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="collapse">☰</button>
+      <nav>
+        <div class="menu-section"><button class="menu-item"><span>▦</span>基础设置<i>›</i></button></div>
+        <div class="menu-section"><button class="menu-item"><span>▤</span>订单管理<i>›</i></button></div>
+        <div class="menu-section"><button class="menu-item"><span>▥</span>仓库业务<i>›</i></button></div>
+        <div class="menu-section">
+          <button class="menu-item open"><span>□</span>结算管理<i>⌄</i></button>
+          <button class="submenu active">外部结算管理</button>
+          <button class="submenu">内部结算管理</button>
+        </div>
+        <div class="menu-section"><button class="menu-item"><span>◇</span>统计分析<i>›</i></button></div>
+      </nav>
+    </aside>
+
+    <main class="page-main">
+      <section id="listView" class="page-view">
+        <div class="page-title"><div><h1>外部结算管理</h1><span>结算管理 &gt; <b>外部结算管理</b></span></div></div>
+        <section class="query-panel">
+          <label><span>结算单号</span><input id="codeFilter" placeholder="请输入结算单号"></label>
+          <label><span>外部客户/项目</span><input id="customerFilter" placeholder="请输入客户或项目名称"></label>
+          <label><span>关联租赁订单</span><input id="orderFilter" placeholder="请输入租赁订单号"></label>
+          <label class="date-range"><span>结算周期</span><div><input id="startFilter" type="date"><em>至</em><input id="endFilter" type="date"></div></label>
+          <label><span>结算状态</span><select id="statusFilter"><option>全部</option><option>待生成</option><option>待确认</option><option>已确认</option><option>已导出</option></select></label>
+          <div class="query-actions"><button id="queryBtn" class="primary">查询</button><button id="resetBtn">重置</button></div>
+        </section>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <strong>结算单列表</strong>
+            <div><button id="batchExportBtn">批量导出</button><button id="createBtn" class="primary">生成结算单</button></div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th class="check-col"><input id="checkAll" type="checkbox"></th><th>结算单号</th><th>外部客户/项目</th><th>关联订单</th><th>结算周期</th><th>按时间费用</th><th>工程量/数量费用</th><th>一口价费用</th><th>调整金额</th><th>应结金额</th><th>状态</th><th class="action-col">操作</th></tr></thead>
+              <tbody id="settlementRows"></tbody>
+            </table>
+            <div id="emptyState" class="empty hidden"><strong>暂无符合条件的结算单</strong><span>请调整筛选条件后重新查询</span></div>
+          </div>
+          <footer class="pagination">
+            <span class="page-total">共50条</span><button class="page-btn">上一页</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><span>...</span><button class="page-btn">5</button><button class="page-btn">下一页</button>
+            <select class="page-size"><option>10条/页</option><option>20条/页</option></select><span>跳至</span><input class="page-jump" value="1"><span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="page-view hidden">
+        <div class="page-title">
+          <div><h1>外部结算单详情</h1><span>结算管理 &gt; 外部结算管理 &gt; <b>查看详情</b></span></div>
+          <div class="page-actions"><button class="back-btn">← 返回</button><button id="detailExport">导出</button><button id="detailEdit">编辑</button><button id="detailConfirm" class="primary">确认结算</button></div>
+        </div>
+        <div class="detail-content">
+          <section class="info-block"><h2>结算基础信息</h2><div id="basicInfo" class="info-grid"></div></section>
+          <section class="info-block"><h2>关联订单</h2><div id="orderInfo" class="info-grid"></div></section>
+          <section class="info-block">
+            <h2>费用明细</h2>
+            <div class="mini-table"><table><thead><tr><th>费用类型</th><th>产品/服务</th><th>数量/天数/工程量</th><th>单价</th><th>金额</th><th>调整金额</th><th>备注</th></tr></thead><tbody id="detailFees"></tbody></table></div>
+            <div id="amountSummary" class="amount-summary"></div>
+          </section>
+          <section class="info-block"><h2>人工调整</h2><div class="mini-table"><table><thead><tr><th>调整时间</th><th>调整人</th><th>调整项目</th><th>调整前</th><th>调整后</th><th>调整原因</th></tr></thead><tbody id="adjustmentRows"></tbody></table></div></section>
+          <section class="info-block"><h2>确认记录</h2><ol id="confirmRecords" class="flow-list"></ol></section>
+          <section class="info-block"><h2>附件</h2><div id="attachments" class="file-list"></div></section>
+        </div>
+      </section>
+
+      <section id="editView" class="page-view hidden">
+        <div class="page-title">
+          <div><h1 id="editTitle">生成结算单</h1><span>结算管理 &gt; 外部结算管理 &gt; <b id="editCrumb">生成</b></span></div>
+          <div class="page-actions"><button class="back-btn">取消</button><button id="saveBtn">保存</button><button id="submitBtn" class="primary">提交确认</button></div>
+        </div>
+        <form class="edit-content">
+          <section class="info-block">
+            <h2>结算基础信息</h2>
+            <div class="form-grid">
+              <label class="form-item"><span class="form-label">结算单号</span><input id="editCode" value="系统自动生成" disabled></label>
+              <label class="form-item required"><span class="form-label">收费租赁订单</span><select id="editOrder"><option value="">请选择已执行的收费租赁订单</option><option>ZL-202606-018｜华东高架 3 标</option><option>ZL-202605-026｜沪苏湖站房项目</option></select></label>
+              <label class="form-item required"><span class="form-label">外部客户/项目</span><input id="editCustomer" value="华东高架 3 标项目部"></label>
+              <label class="form-item required"><span class="form-label">结算开始日期</span><input id="editStart" type="date" value="2026-05-01"></label>
+              <label class="form-item required"><span class="form-label">结算结束日期</span><input id="editEnd" type="date" value="2026-05-31"></label>
+              <label class="form-item"><span class="form-label">合同编号</span><input id="editContract" value="KC-ZL-2026-018"></label>
+              <label class="form-item full"><span class="form-label">结算说明</span><textarea id="editDesc">依据租赁订单出库记录及合同计价规则生成本期结算。</textarea></label>
+            </div>
+          </section>
+          <section class="info-block">
+            <div class="block-title-row"><h2>费用明细</h2><button type="button" id="addFeeBtn">新增费用项</button></div>
+            <div class="mini-table edit-table"><table><thead><tr><th>费用类型</th><th>产品/服务</th><th>数量/天数/工程量</th><th>单价</th><th>金额</th><th>调整金额</th><th>备注</th><th>操作</th></tr></thead><tbody id="editFees"></tbody></table></div>
+            <div id="editSummary" class="amount-summary"></div>
+          </section>
+          <section class="info-block"><h2>附件</h2><div class="upload-panel"><button type="button" id="uploadBtn">选择文件</button><span>支持合同、签认单、工程量确认单等文件，单个文件不超过 20MB</span><strong id="uploadText">暂未选择文件</strong></div></section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="confirmModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head"><h2>确认结算</h2><button id="closeModal">×</button></div>
+      <div class="modal-body">
+        <p>确认后结算单金额将锁定，并记录当前确认人。请核对费用明细与附件。</p>
+        <label><span>确认意见</span><textarea id="confirmComment">费用明细与合同计价规则一致，同意确认。</textarea></label>
+      </div>
+      <div class="modal-actions"><button id="cancelConfirm">取消</button><button id="confirmBtn" class="primary">确认</button></div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+  <script src="./script.js"></script>
+</body>
+</html>

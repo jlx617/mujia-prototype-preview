@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 废旧处置</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">科</span><strong>模架工装管理系统</strong></div>
+      <nav class="nav">
+        <span>首页</span><button>首页工作台</button>
+        <span>基础数据</span><button>仓库设置</button><button>产品分类</button><button>产品管理/资产档案</button><button>BOM 清单</button>
+        <span>业务管理</span><button>需求计划管理</button><button>租赁订单管理</button><button>调拨订单管理</button><button>采购订单管理</button>
+        <span>资产管理</span><button>仓库管理</button><button>出库</button><button>入库</button><button>盘点</button><button>翻新维保</button><button>改制</button><button class="active">废旧处置</button>
+        <span>统计分析</span><button>库存分析</button><button>成本分析</button>
+      </nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">首页 / 资产管理 / <strong>废旧处置</strong></div>
+        <div class="top-actions">
+          <label class="warehouse-switch">当前仓库
+            <select id="topWarehouse"><option>上海物料站</option><option>苏州装备中心</option><option>江北项目仓</option></select>
+          </label>
+          <label class="role-switch">当前视角
+            <select id="roleSwitch"><option value="warehouse">仓库业务操作角色</option><option value="project">项目业务操作角色</option><option value="approver">审批确认人</option></select>
+          </label>
+          <button>反馈</button><button>通知<span class="dot">2</span></button><span class="avatar">仓</span>
+        </div>
+      </header>
+
+      <section id="listView" class="view is-active">
+        <div class="page-title"><div><h1>废旧处置</h1><span>资产管理 / 废旧处置</span></div></div>
+        <form class="filter-panel">
+          <label><span>处置单号</span><input id="noFilter" placeholder="请输入处置单号"></label>
+          <label><span>处置类型</span><select id="typeFilter"><option>全部</option><option>报废</option><option>处置</option></select></label>
+          <label><span>审批状态</span><select id="approvalFilter"><option>全部</option><option>待提交</option><option>审批中</option><option>通过</option><option>驳回</option></select></label>
+          <label><span>执行状态</span><select id="executeFilter"><option>全部</option><option>待执行</option><option>已处置</option><option>已出库</option></select></label>
+          <div class="filter-actions"><button type="button" class="primary" id="queryBtn">查询</button><button type="button" id="resetBtn">重置</button></div>
+        </form>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <strong>处置申请列表</strong>
+            <div class="toolbar-actions"><button id="exportBtn">导出</button><button class="primary" id="createBtn">新增处置申请</button></div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr><th>处置单号</th><th>申请方</th><th>物资项数</th><th>预估重量</th><th>处置类型</th><th>审批状态</th><th>过磅状态</th><th>收款状态</th><th>报废出库状态</th><th>操作</th></tr></thead>
+              <tbody id="recordRows"></tbody>
+            </table>
+            <div class="empty-state hidden" id="emptyState"><strong>暂无符合条件的处置申请</strong><span>请调整筛选条件后重新查询</span></div>
+          </div>
+          <footer class="pagination">
+            <span class="page-total">共50条</span><button class="page-btn disabled">上一页</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><span class="page-ellipsis">...</span><button class="page-btn">5</button><button class="page-btn">下一页</button>
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select><span>跳至</span><input class="page-jump" value="1"><span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div><h1 id="detailTitle">处置申请详情</h1><span>资产管理 / 废旧处置 / 查看详情</span></div>
+          <div class="page-actions"><button class="backBtn">返回</button><button id="detailEditBtn">编辑</button><button class="primary" id="detailApproveBtn">审批</button><button class="primary" id="detailOutboundBtn">发起报废出库</button><button class="primary" id="detailConfirmBtn">确认出库</button></div>
+        </div>
+        <div class="detail-layout">
+          <article class="content-panel"><h2>基本信息</h2><dl class="info-grid" id="baseInfo"></dl></article>
+          <article class="content-panel">
+            <h2>处置物资明细</h2>
+            <div class="table-scroll"><table class="detail-table"><thead><tr><th>产品</th><th>规格</th><th>数量</th><th>单位</th><th>预估重量</th><th>处置原因</th><th>残值参考</th><th>备注</th></tr></thead><tbody id="materialRows"></tbody></table></div>
+          </article>
+          <article class="content-panel"><h2>过磅与收款</h2><dl class="info-grid" id="settlementInfo"></dl></article>
+          <article class="content-panel"><h2>报废出库</h2><dl class="info-grid" id="outboundInfo"></dl></article>
+          <article class="content-panel"><h2>审批记录</h2><ol class="flow-list" id="approvalFlow"></ol></article>
+          <article class="content-panel"><h2>附件资料</h2><div class="attachment-grid" id="attachments"></div></article>
+        </div>
+      </section>
+
+      <section id="editView" class="view">
+        <div class="page-title">
+          <div><h1 id="editTitle">新增处置申请</h1><span>资产管理 / 废旧处置 / <b id="editCrumb">新增</b></span></div>
+          <div class="page-actions"><button class="backBtn">取消</button><button id="saveBtn">保存</button><button class="primary" id="submitBtn">提交审批</button></div>
+        </div>
+        <form class="edit-form">
+          <section class="content-panel">
+            <h2>申请信息</h2>
+            <div class="form-grid">
+              <label class="form-item"><span class="form-label">处置单号</span><input id="editNo" value="系统自动生成" disabled></label>
+              <label class="form-item required"><span class="form-label">处置类型</span><select id="editType"><option>报废</option><option>处置</option></select></label>
+              <label class="form-item required"><span class="form-label">申请方</span><input id="editApplicantOrg" value="科创公司上海物料站"></label>
+              <label class="form-item required"><span class="form-label">计划处置日期</span><input id="editDate" type="date" value="2026-06-18"></label>
+              <label class="form-item required"><span class="form-label">是否大额/特殊</span><select id="editSpecial"><option>否</option><option>是，追加领导审批</option></select></label>
+              <label class="form-item"><span class="form-label">申请人</span><input value="李晨" disabled></label>
+              <label class="form-item full required"><span class="form-label">申请说明</span><textarea id="editReason">长期露天使用后严重锈蚀变形，经检验已无修复使用价值，申请集中报废处置。</textarea></label>
+            </div>
+          </section>
+          <section class="content-panel">
+            <div class="section-heading"><h2>处置物资明细</h2><button type="button" id="addMaterialBtn">添加物资</button></div>
+            <div class="table-scroll">
+              <table class="edit-table"><thead><tr><th>产品</th><th>规格</th><th>数量</th><th>单位</th><th>预估重量(吨)</th><th>处置原因</th><th>残值参考(元)</th><th>备注</th></tr></thead>
+                <tbody><tr><td><input value="钢支撑"></td><td><input value="609×16×6000mm"></td><td><input value="18"></td><td><select><option>根</option></select></td><td><input value="7.82"></td><td><input value="严重锈蚀变形"></td><td><input value="15200.00"></td><td><input value="待过磅复核"></td></tr></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="content-panel">
+            <h2>附件资料</h2>
+            <div class="form-grid">
+              <div class="form-item full upload-item"><span class="form-label">附件</span><div class="upload-panel"><button type="button" id="uploadBtn">上传文件</button><span>支持过磅单、收款凭证、现场照片及审批资料，单个文件不超过 20MB</span><strong id="fileText">现场照片-报废物资.zip、二级公司处置审批资料.pdf</strong></div></div>
+            </div>
+          </section>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="approvalModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>处置申请审批</h2><button data-close="approvalModal">×</button></div>
+      <div class="modal-body"><label class="modal-field"><span>审批结论</span><select id="approvalResult"><option>同意</option><option>驳回</option></select></label><label class="modal-field"><span>审批意见</span><textarea id="approvalComment">资料齐全，同意按流程处置。</textarea></label></div>
+      <div class="modal-actions"><button data-close="approvalModal">取消</button><button class="primary" id="confirmApproval">确定</button></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="inventoryModal">
+    <div class="modal-card inventory-card">
+      <div class="modal-head"><h2>选择报废出库库存</h2><button data-close="inventoryModal">×</button></div>
+      <div class="modal-body">
+        <div class="inventory-summary">当前仓库：<strong id="inventoryWarehouse">上海物料站</strong>　已选 2 项，预计扣减 18 根 / 7.82 吨</div>
+        <table class="select-table"><thead><tr><th></th><th>库存批次/资产编号</th><th>产品</th><th>可用数量</th><th>本次出库</th><th>库位</th></tr></thead><tbody>
+          <tr><td><input type="checkbox" checked></td><td>PC-202401-016</td><td>钢支撑 609×16×6000mm</td><td>12 根</td><td><input value="12"></td><td>A区 / A-02-08</td></tr>
+          <tr><td><input type="checkbox" checked></td><td>PC-202402-009</td><td>钢支撑 609×16×6000mm</td><td>6 根</td><td><input value="6"></td><td>A区 / A-03-01</td></tr>
+        </tbody></table>
+      </div>
+      <div class="modal-actions"><button data-close="inventoryModal">取消</button><button class="primary" id="confirmInventory">发起出库</button></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="confirmModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>确认报废出库</h2><button data-close="confirmModal">×</button></div>
+      <div class="modal-body"><p class="confirm-text">确认后将扣减所选库存并生成报废出库台账。发起人不能确认本人发起的出库。</p><label class="modal-field"><span>确认意见</span><textarea id="confirmComment">现场物资与出库清单一致，同意出库。</textarea></label></div>
+      <div class="modal-actions"><button data-close="confirmModal">取消</button><button class="primary" id="confirmOutbound">确认出库</button></div>
+    </div>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+  <script src="./script.js"></script>
+</body>
+</html>

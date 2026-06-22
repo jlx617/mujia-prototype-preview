@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模架工装管理系统 - 翻新维保</title>
+  <link rel="stylesheet" href="./maintenance-records.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">科</span>
+        <strong>模架工装管理系统</strong>
+      </div>
+      <nav class="nav">
+        <span>首页</span>
+        <button>首页工作台</button>
+        <span>基础数据</span>
+        <button>仓库设置</button>
+        <button>产品分类</button>
+        <button>产品管理/资产档案</button>
+        <button>BOM 清单</button>
+        <span>资产管理</span>
+        <button>仓库管理</button>
+        <button>出库</button>
+        <button>入库</button>
+        <button>盘点</button>
+        <button class="active">翻新维保</button>
+        <button>改制</button>
+        <button>废旧处置</button>
+        <span>统计分析</span>
+        <button>库存/资产利用率分析</button>
+        <button>成本分析</button>
+      </nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">首页 / 资产管理 / <strong>翻新维保</strong></div>
+        <div class="top-actions">
+          <span>当前公司：科创公司</span>
+          <button>反馈</button>
+          <button>通知<span class="dot">4</span></button>
+          <span class="avatar">仓</span>
+          <span>仓库业务操作角色</span>
+        </div>
+      </header>
+
+      <section id="listView" class="view is-active">
+        <div class="page-title">
+          <div>
+            <h1>翻新维保</h1>
+            <span>资产管理 / 翻新维保</span>
+          </div>
+        </div>
+
+        <form class="filter-panel">
+          <label>当前仓库
+            <select id="warehouseFilter">
+              <option>全部</option>
+              <option>上海物料站</option>
+              <option>苏州装备中心</option>
+              <option>翻新待检仓</option>
+            </select>
+          </label>
+          <label>单号<input id="orderFilter" placeholder="翻新维保单号"></label>
+          <label>来源
+            <select id="sourceFilter">
+              <option>全部</option>
+              <option>订单同步</option>
+              <option>手工创建</option>
+            </select>
+          </label>
+          <label>类型
+            <select id="typeFilter">
+              <option>全部</option>
+              <option>翻新</option>
+              <option>维保</option>
+            </select>
+          </label>
+          <label>审批状态
+            <select id="approvalFilter">
+              <option>全部</option>
+              <option>待提交</option>
+              <option>审批中</option>
+              <option>通过</option>
+              <option>驳回</option>
+            </select>
+          </label>
+          <label>执行状态
+            <select id="executeFilter">
+              <option>全部</option>
+              <option>待执行</option>
+              <option>执行中</option>
+              <option>已完成</option>
+            </select>
+          </label>
+          <div class="filter-actions">
+            <button type="button" class="primary" id="queryBtn">查询</button>
+            <button type="button" id="resetBtn">重置</button>
+          </div>
+        </form>
+
+        <section class="table-panel">
+          <div class="table-toolbar">
+            <div class="toolbar-title">翻新维保任务</div>
+            <div class="toolbar-actions">
+              <button id="exportBtn">导出</button>
+              <button id="syncBtn">从订单同步</button>
+              <button class="primary" id="createBtn">新增翻新维保</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="全选"></th>
+                  <th>单号</th>
+                  <th>类型</th>
+                  <th>来源订单</th>
+                  <th>产品/资产</th>
+                  <th>数量</th>
+                  <th>外包单位</th>
+                  <th>预计费用</th>
+                  <th>审批状态</th>
+                  <th>执行状态</th>
+                  <th>入库状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordRows"></tbody>
+            </table>
+            <div class="empty-state hidden" id="emptyState">
+              <strong>暂无符合条件的翻新维保任务</strong>
+              <span>请调整筛选条件后重新查询</span>
+            </div>
+          </div>
+          <footer class="pager">
+            <span id="summaryText">共 0 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn current">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">›</button>
+            <select class="page-size"><option>20条/页</option><option>50条/页</option></select>
+            <span>跳至</span>
+            <input class="page-jump" value="1">
+            <span>页</span>
+          </footer>
+        </section>
+      </section>
+
+      <section id="detailView" class="view">
+        <div class="page-title">
+          <div>
+            <h1 id="detailHeading">翻新维保详情</h1>
+            <span>资产管理 / 翻新维保 / 查看详情</span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">返回</button>
+            <button id="detailEditBtn" class="primary">编辑</button>
+          </div>
+        </div>
+
+        <div class="detail-shell">
+          <section class="detail-content">
+            <article class="info-block" id="detailBase">
+              <h2>基础信息</h2>
+              <dl class="info-grid" id="baseFields"></dl>
+            </article>
+            <article class="info-block" id="detailProblem">
+              <h2>处理要求</h2>
+              <dl class="info-grid" id="problemFields"></dl>
+            </article>
+            <article class="info-block" id="detailApproval">
+              <h2>审批记录</h2>
+              <ol class="timeline" id="approvalRows"></ol>
+            </article>
+            <article class="info-block" id="detailProcess">
+              <h2>执行结果</h2>
+              <ol class="timeline" id="processRows"></ol>
+            </article>
+            <article class="info-block" id="detailCost">
+              <h2>费用附件</h2>
+              <div class="file-grid" id="fileRows"></div>
+            </article>
+            <article class="info-block" id="detailRelation">
+              <h2>关联业务</h2>
+              <table class="detail-table">
+                <thead><tr><th>业务类型</th><th>单据编号</th><th>业务状态</th><th>备注</th></tr></thead>
+                <tbody id="relationRows"></tbody>
+              </table>
+            </article>
+          </section>
+          <aside class="anchor">
+            <a href="#detailBase">基础</a>
+            <a href="#detailProblem">要求</a>
+            <a href="#detailApproval">审批</a>
+            <a href="#detailProcess">执行</a>
+            <a href="#detailCost">费用</a>
+            <a href="#detailRelation">关联</a>
+          </aside>
+        </div>
+      </section>
+
+      <section id="editView" class="view">
+        <div class="page-title">
+          <div>
+            <h1 id="editHeading">新增翻新维保</h1>
+            <span>资产管理 / 翻新维保 / <b id="editCrumb">新增</b></span>
+          </div>
+          <div class="page-actions">
+            <button class="backBtn">取消</button>
+            <button id="saveDraftBtn">保存</button>
+            <button class="primary" id="submitBtn">提交</button>
+          </div>
+        </div>
+
+        <form class="edit-panel">
+          <section class="info-block">
+            <h2>基础信息</h2>
+            <div class="form-grid">
+              <label><span>*</span>单号<input id="editNo" value="系统自动生成" disabled></label>
+              <label><span>*</span>资产/产品<input id="editAsset" value="钢支撑 609x16x6000"></label>
+              <label><span>*</span>类型<select id="editType"><option>翻新</option><option>维保</option></select></label>
+              <label>来源<select id="editSource"><option>订单同步</option><option>手工创建</option></select></label>
+              <label>来源订单<input id="editSourceOrder" value="ZL-202605-018"></label>
+              <label>数量<input id="editQty" value="96 根"></label>
+              <label>仓库<select id="editWarehouse"><option>翻新待检仓</option><option>上海物料站</option><option>苏州装备中心</option></select></label>
+              <label>外包单位<input id="editUnit" value="科创建模维修班组"></label>
+              <label>审批状态<select id="editApproval"><option>待提交</option><option>审批中</option><option>通过</option><option>驳回</option></select></label>
+              <label>执行状态<select id="editExecute"><option>待执行</option><option>执行中</option><option>已完成</option></select></label>
+              <label>入库状态<select id="editInbound"><option>未生成</option><option>待入库</option><option>已入库</option></select></label>
+            </div>
+          </section>
+
+          <section class="info-block">
+            <h2>问题描述与处理要求</h2>
+            <div class="form-grid">
+              <label class="wide">问题描述<textarea id="editProblem">退库待检发现局部变形，需校正后补焊。</textarea></label>
+              <label class="wide">处理要求<textarea id="editRequirement">校正变形部位，焊补后完成喷涂并提交验收照片。</textarea></label>
+            </div>
+          </section>
+
+          <section class="info-block">
+            <h2>执行结果</h2>
+            <div class="form-grid">
+              <label class="wide">执行结果<textarea id="editProcess">已完成校正、焊补和喷涂，等待验收复核。</textarea></label>
+              <label>验收结论<select><option>待验收</option><option>通过</option><option>需返工</option></select></label>
+              <label>执行负责人<input value="陈工"></label>
+            </div>
+          </section>
+
+          <section class="info-block">
+            <h2>费用附件</h2>
+            <div class="form-grid">
+              <label>预计费用<input id="editCost" value="¥8,620.00"></label>
+              <label>费用类型<select><option>翻新成本</option><option>维保成本</option><option>人工调整</option></select></label>
+              <label class="wide">附件<div class="upload-row"><button type="button">上传报价单</button><button type="button">上传照片</button><button type="button">上传验收单</button><span>已上传 3 个文件</span></div></label>
+            </div>
+          </section>
+
+          <section class="info-block">
+            <div class="block-title-row">
+              <h2>关联业务</h2>
+              <button type="button" id="addRelationBtn">添加关联单据</button>
+            </div>
+            <table class="detail-table">
+              <thead><tr><th>业务类型</th><th>单据编号</th><th>业务状态</th><th>备注</th></tr></thead>
+              <tbody id="editRelationRows"></tbody>
+            </table>
+          </section>
+
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="./maintenance-records.js"></script>
+</body>
+</html>
