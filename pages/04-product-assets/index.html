@@ -126,7 +126,8 @@
                 <div class="info-grid">
                   <div><span>产品编码</span><b id="detailCode">KC-MJ-DS-001</b></div><div><span>产品名称</span><b id="detailName">墩身标准节 2000×1500×80 Q355</b></div><div><span>产品分类</span><b id="detailCategory">模架体系 / 墩身标准节</b></div>
                   <div><span>规格</span><b id="detailSpec">2000×1500×80</b></div><div><span>型号</span><b id="detailModel">Q355</b></div><div><span>计量单位</span><b id="detailUnit">块</b></div>
-                  <div><span>管理维度</span><b id="detailMode">序列号</b></div><div><span>供应商</span><b id="detailSupplier">武汉科创加工厂</b></div><div><span>状态</span><b><i id="detailStatus" class="status ok">启用</i></b></div>
+                  <div><span>管理维度</span><b id="detailMode">序列号</b></div><div><span>供应商</span><b id="detailSupplier">武汉科创加工厂</b></div><div><span>关联清单中心产品</span><b id="detailCenterCode">LCZX-MJ-0001</b></div>
+                  <div><span>状态</span><b><i id="detailStatus" class="status ok">启用</i></b></div>
                 </div>
               </section>
 
@@ -155,6 +156,7 @@
                 <label><span>* 计量单位</span><select id="commonUnit"><option>块</option><option>套</option><option>件</option><option>米</option><option>台</option></select></label>
                 <label><span>* 管理维度</span><select id="commonManageMode"><option>序列号</option><option>批次</option><option>数量</option></select></label>
                 <label><span>供应商</span><input id="commonSupplier" value="武汉科创加工厂" placeholder="请输入供应商名称"></label>
+                <label><span>关联清单中心产品</span><input id="commonCenterCode" placeholder="请输入清单中心产品编码"></label>
               </div>
             </section>
 
@@ -208,6 +210,7 @@
                 <label><span>计量单位</span><input id="singleUnit" value="块" readonly></label>
                 <label><span>管理维度</span><input id="singleMode" value="序列号" readonly></label>
                 <label><span>供应商</span><input id="singleSupplier" value="武汉科创加工厂"></label>
+                <label><span>关联清单中心产品</span><input id="singleCenterCode" value="LCZX-MJ-0001"></label>
                 <label><span>状态</span><select id="singleStatus"><option>启用</option><option>停用</option></select></label>
               </div>
             </section>
@@ -235,7 +238,7 @@
   <section id="modal" class="modal hidden">
     <header><h2>导入产品档案</h2><button id="closeModal">×</button></header>
     <div class="modal-body">
-      <div class="upload"><strong>上传产品模板</strong><p>模板字段：产品编码、名称、分类、规格型号、管理维度、单位、供应商、图纸状态、保密等级。</p><button>选择文件</button></div>
+      <div class="upload"><strong>上传产品模板</strong><p>模板字段：产品编码、名称、分类、规格型号、管理维度、单位、供应商、清单中心产品编码、图纸状态、保密等级。</p><button>选择文件</button></div>
       <div class="check-list"><b>异常校验</b><span>编码重复</span><span>分类不存在</span><span>规格组合缺失</span><span>涉密图纸无权限</span><span>附件格式异常</span><span>来源冲突</span></div>
     </div>
     <footer><button id="cancelImport">取消</button><button>下载模板</button><button class="primary">开始导入</button></footer>
