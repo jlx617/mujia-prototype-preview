@@ -1,4 +1,4 @@
-const products = [
+﻿const products = [
   { code: "KC-MJ-DS-001", name: "墩身标准节 2.0m", category: "墩身标准节", parent: "模架体系", spec: "长度2000mm / 宽度1500mm / 厚度80mm / 材质Q355", mode: "序列号", unit: "块", supplier: "武汉科创加工厂", attrs: "Q355", status: "启用", owner: "中心主数据管理员", cost: "一物一码", drawing: "已归档", centerCode: "LCZX-MJ-0001" },
   { code: "KC-MJ-CT-006", name: "承台侧模 A 型", category: "承台侧模", parent: "模架体系", spec: "长度3000mm / 宽度1200mm / 厚度90mm / 型号A型", mode: "序列号", unit: "块", supplier: "湖北桥建钢构", attrs: "A型", status: "启用", owner: "中心主数据管理员", cost: "批次", drawing: "涉密受控", centerCode: "LCZX-MJ-0002" },
   { code: "KC-GZ-TC-002", name: "液压台车主梁", category: "台车主梁", parent: "集成工装", spec: "长度12m / 结构组合梁 / 型号加强型", mode: "序列号", unit: "套", supplier: "中铁模板配套", attrs: "加强型", status: "启用", owner: "中心主数据管理员", cost: "人工指定", drawing: "已归档", centerCode: "LCZX-GZ-0003" },
