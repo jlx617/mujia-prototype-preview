@@ -1,11 +1,11 @@
 const products = [
-  { code: "KC-MJ-DS-001", name: "墩身标准节 2.0m", category: "墩身标准节", parent: "模架体系", spec: "长度2000mm / 宽度1500mm / 厚度80mm / 材质Q355", mode: "序列号", unit: "块", supplier: "武汉科创加工厂", attrs: "Q355", status: "启用", owner: "中心主数据管理员", cost: "一物一码", drawing: "已归档" },
-  { code: "KC-MJ-CT-006", name: "承台侧模 A 型", category: "承台侧模", parent: "模架体系", spec: "长度3000mm / 宽度1200mm / 厚度90mm / 型号A型", mode: "序列号", unit: "块", supplier: "湖北桥建钢构", attrs: "A型", status: "启用", owner: "中心主数据管理员", cost: "批次", drawing: "涉密受控" },
-  { code: "KC-GZ-TC-002", name: "液压台车主梁", category: "台车主梁", parent: "集成工装", spec: "长度12m / 结构组合梁 / 型号加强型", mode: "序列号", unit: "套", supplier: "中铁模板配套", attrs: "加强型", status: "启用", owner: "中心主数据管理员", cost: "人工指定", drawing: "已归档" },
-  { code: "KC-SB-YY-014", name: "液压泵站 15kW", category: "液压泵站", parent: "大型设备", spec: "功率15kW / 压力31.5MPa / 型号高压型", mode: "序列号", unit: "台", supplier: "中铁模板配套", attrs: "高压型", status: "启用", owner: "中心主数据管理员", cost: "最新采购价", drawing: "待上传" },
-  { code: "KC-FC-LS-021", name: "连接螺栓 M20", category: "连接件", parent: "低值辅材", spec: "直径M20 / 长度70mm / 强度8.8级 / 表面镀锌", mode: "数量", unit: "件", supplier: "本地辅材采购", attrs: "8.8级", status: "启用", owner: "中心主数据管理员", cost: "采购均价", drawing: "缺失" },
-  { code: "KC-MJ-PM-018", name: "平模通用板", category: "墩身标准节", parent: "模架体系", spec: "长度1500mm / 宽度1000mm / 厚度70mm / 材质Q235", mode: "批次", unit: "块", supplier: "武汉科创加工厂", attrs: "Q235", status: "启用", owner: "中心主数据管理员", cost: "待确认", drawing: "涉密受控" },
-  { code: "KC-FC-MD-009", name: "木垫板", category: "木垫板", parent: "低值辅材", spec: "长度4000mm / 宽度200mm / 厚度50mm / 材质松木", mode: "批次", unit: "米", supplier: "本地辅材采购", attrs: "松木", status: "停用", owner: "中心主数据管理员", cost: "批次", drawing: "缺失" }
+  { code: "KC-MJ-DS-001", name: "墩身标准节 2.0m", category: "墩身标准节", parent: "模架体系", spec: "长度2000mm / 宽度1500mm / 厚度80mm / 材质Q355", mode: "序列号", unit: "块", supplier: "武汉科创加工厂", attrs: "Q355", status: "启用", owner: "中心主数据管理员", cost: "一物一码", drawing: "已归档", centerCode: "LCZX-MJ-0001" },
+  { code: "KC-MJ-CT-006", name: "承台侧模 A 型", category: "承台侧模", parent: "模架体系", spec: "长度3000mm / 宽度1200mm / 厚度90mm / 型号A型", mode: "序列号", unit: "块", supplier: "湖北桥建钢构", attrs: "A型", status: "启用", owner: "中心主数据管理员", cost: "批次", drawing: "涉密受控", centerCode: "LCZX-MJ-0002" },
+  { code: "KC-GZ-TC-002", name: "液压台车主梁", category: "台车主梁", parent: "集成工装", spec: "长度12m / 结构组合梁 / 型号加强型", mode: "序列号", unit: "套", supplier: "中铁模板配套", attrs: "加强型", status: "启用", owner: "中心主数据管理员", cost: "人工指定", drawing: "已归档", centerCode: "LCZX-GZ-0003" },
+  { code: "KC-SB-YY-014", name: "液压泵站 15kW", category: "液压泵站", parent: "大型设备", spec: "功率15kW / 压力31.5MPa / 型号高压型", mode: "序列号", unit: "台", supplier: "中铁模板配套", attrs: "高压型", status: "启用", owner: "中心主数据管理员", cost: "最新采购价", drawing: "待上传", centerCode: "LCZX-SB-0004" },
+  { code: "KC-FC-LS-021", name: "连接螺栓 M20", category: "连接件", parent: "低值辅材", spec: "直径M20 / 长度70mm / 强度8.8级 / 表面镀锌", mode: "数量", unit: "件", supplier: "本地辅材采购", attrs: "8.8级", status: "启用", owner: "中心主数据管理员", cost: "采购均价", drawing: "缺失", centerCode: "LCZX-FC-0005" },
+  { code: "KC-MJ-PM-018", name: "平模通用板", category: "墩身标准节", parent: "模架体系", spec: "长度1500mm / 宽度1000mm / 厚度70mm / 材质Q235", mode: "批次", unit: "块", supplier: "武汉科创加工厂", attrs: "Q235", status: "启用", owner: "中心主数据管理员", cost: "待确认", drawing: "涉密受控", centerCode: "LCZX-MJ-0006" },
+  { code: "KC-FC-MD-009", name: "木垫板", category: "木垫板", parent: "低值辅材", spec: "长度4000mm / 宽度200mm / 厚度50mm / 材质松木", mode: "批次", unit: "米", supplier: "本地辅材采购", attrs: "松木", status: "停用", owner: "中心主数据管理员", cost: "批次", drawing: "缺失", centerCode: "LCZX-FC-0007" }
 ];
 
 const instances = [
@@ -30,6 +30,7 @@ const editCategory = document.querySelector("#editCategory");
 const commonUnit = document.querySelector("#commonUnit");
 const commonManageMode = document.querySelector("#commonManageMode");
 const commonSupplier = document.querySelector("#commonSupplier");
+const commonCenterCode = document.querySelector("#commonCenterCode");
 const specTrigger = document.querySelector("#specTrigger");
 const specMenu = document.querySelector("#specMenu");
 const specTags = document.querySelector("#specTags");
@@ -235,6 +236,7 @@ function prepareSingleEdit(item) {
   document.querySelector("#singleUnit").value = item.unit;
   document.querySelector("#singleMode").value = item.mode;
   document.querySelector("#singleSupplier").value = item.supplier;
+  document.querySelector("#singleCenterCode").value = item.centerCode || "";
   document.querySelector("#singleStatus").value = item.status;
 }
 
@@ -257,6 +259,7 @@ function prepareDetail(item) {
   document.querySelector("#detailUnit").textContent = item.unit;
   document.querySelector("#detailMode").textContent = item.mode;
   document.querySelector("#detailSupplier").textContent = item.supplier;
+  document.querySelector("#detailCenterCode").textContent = item.centerCode || "-";
   const status = document.querySelector("#detailStatus");
   status.textContent = item.status;
   status.className = `status ${statusClass(item.status)}`;
@@ -267,6 +270,7 @@ function syncSingleEditToList(code) {
   if (!item) return;
   item.name = document.querySelector("#singleName").value.trim() || item.name;
   item.supplier = document.querySelector("#singleSupplier").value.trim() || item.supplier;
+  item.centerCode = document.querySelector("#singleCenterCode").value.trim();
   item.status = document.querySelector("#singleStatus").value;
   renderProducts(products);
 }
@@ -290,7 +294,8 @@ function appendPreviewRowsToProducts() {
       status: "启用",
       owner: "中心主数据管理员",
       cost: "",
-      drawing: "待上传"
+      drawing: "待上传",
+      centerCode: commonCenterCode.value.trim()
     });
   });
   selectedCategory = "全部";
