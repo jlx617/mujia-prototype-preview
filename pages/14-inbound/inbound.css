@@ -580,6 +580,113 @@ tbody tr:hover td { background: #fbfdff; }
 .edit-table input, .edit-table select { min-width: 86px; }
 .edit-table { min-width: 1180px; }
 .detail-table { min-width: 1080px; }
+.detail-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--divider-color);
+  border-radius: var(--radius-base);
+}
+.typed-detail-table {
+  min-width: 1320px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.typed-detail-table th,
+.typed-detail-table td {
+  min-width: 92px;
+  height: 40px;
+  padding: 8px;
+  border-right: 1px solid var(--divider-color);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 18px;
+  vertical-align: middle;
+}
+.typed-detail-table th:last-child,
+.typed-detail-table td:last-child {
+  border-right: 0;
+}
+.typed-detail-table .group-head {
+  text-align: center;
+  background: #eaf4fb;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+.typed-detail-table .weight-cell {
+  min-width: 136px;
+  background: #fbfdff;
+}
+.weight-stack {
+  display: grid;
+  gap: 8px;
+}
+.weight-stack span,
+.weight-stack strong {
+  display: block;
+  white-space: nowrap;
+}
+.approval-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.approval-tabs button {
+  height: 28px;
+  border-color: transparent;
+  background: #f5f7fa;
+}
+.approval-tabs button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.approval-timeline {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.approval-node {
+  position: relative;
+  min-width: 148px;
+  min-height: 76px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider-color);
+  border-radius: var(--radius-base);
+  background: #fff;
+}
+.approval-node b {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f5f7fa;
+  color: var(--text-secondary);
+}
+.approval-node strong {
+  font-size: 13px;
+}
+.approval-node span {
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
+}
+.approval-node.done b {
+  background: var(--color-success);
+  color: #fff;
+}
+.approval-node.current {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.approval-node.current b {
+  background: var(--color-primary);
+  color: #fff;
+}
 .edit-table th:last-child,
 .edit-table td:last-child { width: 64px; text-align: center; }
 .edit-table input[readonly] {
