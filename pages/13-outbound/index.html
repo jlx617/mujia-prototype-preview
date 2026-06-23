@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>模架工装管理系统 - 出库</title>
-  <link rel="stylesheet" href="./outbound.css?v=20260622-detail-table-lines">
+  <link rel="stylesheet" href="./outbound.css?v=20260623-list-cleanup">
 </head>
 <body>
   <div class="app-shell">
@@ -98,16 +98,6 @@
               <option>驳回</option>
             </select>
           </label>
-          <label>差异状态
-            <select id="diffFilter">
-              <option>全部</option>
-              <option>无差异</option>
-              <option>待项目复核</option>
-              <option>待仓库确认差异</option>
-              <option>已同步入库记录</option>
-              <option>已同步租赁订单</option>
-            </select>
-          </label>
           <label>司机/车牌
             <input id="driverFilter" placeholder="司机姓名或车牌号">
           </label>
@@ -115,7 +105,6 @@
             <select id="statusFilter">
               <option>全部</option>
               <option>待出库</option>
-              <option>部分出库</option>
               <option>已出库</option>
             </select>
           </label>
@@ -130,16 +119,9 @@
 
         <section class="table-panel">
           <div class="table-toolbar">
-            <div class="task-tabs" aria-label="出库任务筛选">
-              <button class="tab active" data-task="all">全部出库单</button>
-              <button class="tab" data-task="pending">待出库任务 <b>5</b></button>
-              <button class="tab" data-task="weighing">待过磅 <b>3</b></button>
-              <button class="tab" data-task="confirm">待确认单 <b>4</b></button>
-            </div>
+            <div class="toolbar-title">出库单列表</div>
             <div class="toolbar-actions">
               <button id="exportBtn">导出</button>
-              <button id="syncOrderBtn">从订单同步</button>
-              <button id="batchHandleBtn">办理出库</button>
               <button class="primary" id="createBtn">新增出库</button>
             </div>
           </div>
@@ -155,9 +137,10 @@
                   <th>对向入库单</th>
                   <th>出库仓库</th>
                   <th>目标项目/仓库</th>
+                  <th>司机</th>
+                  <th>车牌</th>
                   <th>物资项数</th>
                   <th>审批状态</th>
-                  <th>差异状态</th>
                   <th>出库状态</th>
                   <th>操作</th>
                 </tr>
@@ -441,6 +424,6 @@
     </footer>
   </section>
 
-  <script src="./outbound.js?v=20260622-detail-table-lines"></script>
+  <script src="./outbound.js?v=20260623-list-cleanup"></script>
 </body>
 </html>
