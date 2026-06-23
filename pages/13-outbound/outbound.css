@@ -230,7 +230,7 @@ label {
   border-collapse: collapse;
   table-layout: fixed;
 }
-.data-table { min-width: 1360px; }
+.data-table { min-width: 1520px; }
 th, td {
   height: var(--table-row-height);
   padding: 0 8px;
@@ -248,10 +248,11 @@ th { background: #f3f6f9; font-weight: 600; }
 .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 140px; }
 .data-table th:nth-child(6), .data-table td:nth-child(6) { width: 132px; }
 .data-table th:nth-child(7), .data-table td:nth-child(7) { width: 150px; }
-.data-table th:nth-child(8), .data-table td:nth-child(8) { width: 84px; }
-.data-table th:nth-child(9), .data-table td:nth-child(9) { width: 108px; }
-.data-table th:nth-child(10), .data-table td:nth-child(10) { width: 138px; }
+.data-table th:nth-child(8), .data-table td:nth-child(8) { width: 88px; }
+.data-table th:nth-child(9), .data-table td:nth-child(9) { width: 112px; }
+.data-table th:nth-child(10), .data-table td:nth-child(10) { width: 84px; }
 .data-table th:nth-child(11), .data-table td:nth-child(11) { width: 108px; }
+.data-table th:nth-child(12), .data-table td:nth-child(12) { width: 108px; }
 .data-table th:last-child, .data-table td:last-child { width: 130px; }
 tbody tr:hover td { background: #fbfdff; }
 .row-actions { display: flex; gap: 6px; }
