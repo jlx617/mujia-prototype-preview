@@ -683,8 +683,8 @@ function renderTypeOverview() {
   $("typeOverviewCards").innerHTML = [
     summaryCard("来源类型", config.sourceLabel),
     summaryCard("办理角色", config.handler),
-    summaryCard("审批口径", config.approval),
-    summaryCard("库存影响", config.stockEffect),
+    summaryCard("审批状态", currentOrder.confirm),
+    summaryCard("库存状态", currentOrder.status),
   ].join("");
 }
 
@@ -693,34 +693,46 @@ function renderSourceRelation() {
   const diffCount = currentOrder.items.filter((item) => calcDiff(item) !== 0).length;
   const netDiff = toNumber(currentOrder.netWeight) - toNumber(currentOrder.outboundNetWeight);
   $("sourceRelationPanel").innerHTML = [
-    ["来源规则", config.sourceRule],
     ["来源单据", currentOrder.source],
     ["来源订单", currentOrder.sourceOrder || "-"],
-    ["物资生成", config.materialMode],
+    ["来源出库单", sourceOutboundNo() || "-"],
+    ["入库位置", inboundLocation()],
     ["差异状态", currentOrder.syncState || "待项目验收"],
     ["差异统计", `${diffCount} 项数量差异 / 净重差异 ${netDiff > 0 ? "+" : ""}${netDiff.toFixed(2)} 吨`],
   ].map(([label, value]) => compactRow(label, value)).join("");
   $("syncCards").innerHTML = [
-    summaryCard("生成节点", config.sourceRule),
+    summaryCard("来源类型", config.sourceLabel),
     summaryCard("当前状态", currentOrder.syncState || "待项目验收", "primary"),
-    summaryCard("审批后动作", config.stockEffect),
+    summaryCard("库存状态", currentOrder.status),
   ].join("");
 }
 
 function renderTypeDetail() {
   const config = getTypeConfig();
+  const rows = typeSpecificRows();
   $("typeDetailPanel").innerHTML = `
     <div class="type-block-grid">
       ${config.detailBlocks.map(([title, text]) => `<div class="type-block"><strong>${title}</strong><span>${text}</span></div>`).join("")}
     </div>
     <table class="type-field-table">
-      <thead><tr><th>字段</th><th>页面处理方式</th></tr></thead>
-      <tbody>${config.fields.map(([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`).join("")}</tbody>
+      <thead><tr><th>字段</th><th>内容</th></tr></thead>
+      <tbody>${rows.map(([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`).join("")}</tbody>
     </table>
     <div class="attachment-requirements">
       ${config.requiredAttachments.map((item) => `<span>${item}</span>`).join("")}
     </div>
   `;
+}
+
+function typeSpecificRows() {
+  const diffCount = currentOrder.items.filter((item) => calcDiff(item) !== 0).length;
+  if (currentOrder.type === "租赁入库") return [["来源租赁订单", currentOrder.sourceOrder], ["来源出库单", currentOrder.source], ["入库位置/项目仓库", inboundLocation()], ["来源仓库", currentOrder.supplier || currentOrder.warehouse], ["差异数量", `${diffCount} 项`]];
+  if (currentOrder.type === "调拨入库") return [["来源调拨订单", currentOrder.sourceOrder], ["来源出库单", currentOrder.source], ["调出仓", currentOrder.supplier], ["调入仓", currentOrder.warehouse], ["库存转移记录", currentOrder.syncState || "待同步"]];
+  if (currentOrder.type === "租赁退换入库") return [["来源退换申请", currentOrder.sourceOrder], ["来源退换出库单", currentOrder.source], ["原租赁订单", currentOrder.sourceOrder], ["退换原因", currentOrder.returnReason || "退回检修/换货"], ["复核状态", currentOrder.accept]];
+  if (currentOrder.type === "翻新入库") return [["来源翻新申请", currentOrder.sourceOrder], ["来源翻新出库单", currentOrder.source], ["翻新车间/仓库", currentOrder.supplier], ["翻新状态", currentOrder.accept], ["处理时间", currentOrder.date]];
+  if (currentOrder.type === "改制入库") return [["来源改制申请", currentOrder.sourceOrder], ["来源改制出库单", currentOrder.source], ["改制方向", currentOrder.modifyDirection || "吊头改制"], ["改制状态", currentOrder.accept], ["处理时间", currentOrder.date]];
+  if (currentOrder.type === "采购入库") return [["来源采购申请", currentOrder.source], ["采购订单", currentOrder.sourceOrder], ["供应商", currentOrder.supplier], ["入库仓库", currentOrder.warehouse], ["成本录入状态", currentOrder.cost]];
+  return [["来源新生产申请", currentOrder.source], ["生产任务单", currentOrder.sourceOrder], ["入库仓库", currentOrder.warehouse], ["生产完成时间", currentOrder.date], ["成本录入状态", currentOrder.cost]];
 }
 
 function renderHandleTypeTemplate() {
@@ -729,11 +741,11 @@ function renderHandleTypeTemplate() {
   $("handleSourceOutbound").closest("label").style.display = isSupplyType(type) ? "none" : "";
   $("handleTypeGuidance").innerHTML = [
     summaryCard("来源", config.sourceLabel),
-    summaryCard("生成规则", config.sourceRule),
     summaryCard("办理角色", config.handler),
-    summaryCard("库存影响", config.stockEffect),
+    summaryCard("审批状态", currentOrder.confirm),
+    summaryCard("入库状态", currentOrder.status),
   ].join("");
-  $("handleTypeFields").innerHTML = config.fields.map(([label, value], index) => `
+  $("handleTypeFields").innerHTML = typeSpecificRows().slice(0, 4).map(([label, value], index) => `
     <label>
       <span>${label}</span>
       <input value="${index === 0 ? currentOrder.source || value : value}">
@@ -1052,7 +1064,6 @@ function createInbound() {
     ...inboundOrders[0],
     no: "自动生成",
     source: "",
-    sourceOrder: "",
     sourceOrder: "",
     amount: "0 件 / 0 吨",
     grossWeight: "0.00",
