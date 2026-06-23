@@ -94,7 +94,7 @@ const outboundOrders = [
     itemCount: 2,
     amount: "84 件 / 9.2 吨",
     approval: "审批通过",
-    status: "部分出库",
+    status: "已出库",
     diffStatus: "待项目复核",
     attachment: "已上传",
     weighing: { gross: "13800", tare: "4600", net: "9200" },
@@ -284,7 +284,6 @@ const sourceOrderMaterials = [
   },
 ];
 
-let currentTask = "all";
 let currentOrder = outboundOrders[0];
 let selectedSourceMaterialIds = new Set();
 const $ = (id) => document.getElementById(id);
@@ -303,7 +302,6 @@ const tagClass = {
   "待提交": "tag-yellow",
   "驳回": "tag-red",
   "待出库": "tag-yellow",
-  "部分出库": "tag-blue",
   "已出库": "tag-green",
   "无差异": "tag-green",
   "待项目复核": "tag-yellow",
@@ -340,19 +338,15 @@ function filteredOrders() {
   const warehouse = $("warehouseFilter").value;
   const project = $("projectFilter").value;
   const approval = $("confirmFilter").value;
-  const diff = $("diffFilter").value;
   const status = $("statusFilter").value;
   const driver = $("driverFilter").value.trim();
   return outboundOrders.filter((order) => {
-    const taskHit = currentTask === "all" || order.task === currentTask;
-    return taskHit
-      && (!no || order.no.includes(no))
+    return (!no || order.no.includes(no))
       && (type === "全部" || order.type === type)
       && (!source || order.source.includes(source) || order.no.includes(source) || order.inboundNo.includes(source))
       && (warehouse === "全部" || order.warehouse === warehouse)
       && (project === "全部" || order.project === project)
       && (approval === "全部" || order.approval === approval)
-      && (diff === "全部" || order.diffStatus === diff)
       && (status === "全部" || order.status === status)
       && (!driver || order.driver.includes(driver));
   });
@@ -369,9 +363,10 @@ function renderList() {
       <td title="${order.inboundNo}">${order.inboundNo}</td>
       <td title="${order.warehouse}">${order.warehouse}</td>
       <td title="${order.target}">${order.target}</td>
+      <td title="${driverName(order)}">${driverName(order)}</td>
+      <td title="${vehicleNo(order)}">${vehicleNo(order)}</td>
       <td>${order.itemCount}</td>
       <td>${tag(order.approval)}</td>
-      <td>${tag(order.diffStatus)}</td>
       <td>${tag(order.status)}</td>
       <td>
         <div class="row-actions">
@@ -928,25 +923,14 @@ function showPrint() {
   switchView("printView");
 }
 
-document.querySelectorAll(".tab").forEach((button) => {
-  button.onclick = () => {
-    document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
-    button.classList.add("active");
-    currentTask = button.dataset.task;
-    renderList();
-  };
-});
-
 $("queryBtn").onclick = renderList;
 $("resetBtn").onclick = () => {
-  ["typeFilter", "warehouseFilter", "projectFilter", "confirmFilter", "statusFilter", "diffFilter"].forEach((id) => $(id).value = "全部");
+  ["typeFilter", "warehouseFilter", "projectFilter", "confirmFilter", "statusFilter"].forEach((id) => $(id).value = "全部");
   ["noFilter", "sourceFilter", "driverFilter"].forEach((id) => $(id).value = "");
   $("dateFilter").value = "2026-05-01 至 2026-05-29";
   renderList();
 };
 $("createBtn").onclick = () => showHandle(true);
-$("batchHandleBtn").onclick = () => showHandle(false);
-$("syncOrderBtn").onclick = () => alert("已同步审批通过的业务来源单据。");
 $("exportBtn").onclick = () => alert("已按当前筛选条件生成出库单导出文件。");
 $("detailHandleBtn").onclick = () => showHandle(false);
 $("detailPrintBtn").onclick = showPrint;
